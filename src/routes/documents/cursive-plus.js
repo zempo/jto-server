@@ -4,7 +4,7 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
 <html>
    <head>
       <meta charset="utf-8">
-      <title>${theme.toUpperCase()} PDF</title>
+      <title>${theme.toUpperCase()} Card</title>
       <style>
         @import url('https://fonts.googleapis.com/css?family=Great+Vibes&display=swap');
         * {
@@ -17,12 +17,22 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
           padding: 0;
         }
         .pg {
-         max-width: 504px;
+         max-width: 557px;
          font-family: 'Great Vibes', cursive;
-         height: 704px;
+         height: 797px;
          padding: 30px;
-         margin: 20px auto;
          border: 2px dashed black;
+        }
+        .pg-front {
+          margin: 100px auto;
+        }
+        .spacer {
+          text-align: center;
+          margin: 0 auto;
+          border: 1px solid black;
+        }
+        .pg-inside {
+          margin: 100px auto 0;
         }
         nav {
           position: fixed;
@@ -48,23 +58,29 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
         p {
           text-align: center; 
         }
+        #front-img {
+          height: 400px;
+          width: 600px;
+        }
+        #inside-img {
+          height: 400px;
+          width: 600px;
+        }
       </style>
    </head>
    <body>
-   <p>Created ${`${today.getDate()}. ${today.getMonth() +
-     1}. ${today.getFullYear()}.`} with www.just-the-occasion.com</p>
+   <div class="spacer">1. Print --> 2. Cut --> 3. Paste</div>
      <section class="content">
-     <div class="pg pg-outside">
+     <div class="pg pg-front">
      <h2>${frontMessage}</h2>
      <img src="${frontImage}" alt="front card image"/>
      </div> 
+     <div class="spacer">1. Print --> 2. Cut --> 3. Paste</div>
      <div class="pg pg-inside">
      <p>${insideMessage}</p>
      <img src="${insideImage}" alt="card image interior"/>
      </div>
      </section>
-     <p>Created ${`${today.getDate()}. ${today.getMonth() +
-       1}. ${today.getFullYear()}.`} with www.just-the-occasion.com</p>
    </body>
-</html> `;
+</html>`;
 };
