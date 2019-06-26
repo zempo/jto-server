@@ -1,7 +1,10 @@
 require("dotenv").config();
-// IF USING API KEY
+
+// Bearer AUTH
 const bearer = require("./middleware/bearer");
 //
+
+const bodyParser = require("body-parser");
 const express = require("express");
 const errorCatch = require("./middleware/error");
 const morgan = require("morgan");
@@ -10,14 +13,17 @@ const helmet = require("helmet");
 const logger = require("./middleware/logger").logger;
 const { PORT, NODE_ENV } = require("./config");
 const winston = require("winston");
-// routes
-// const exampleRouter = require('./routes/api/example')
+
+// ROUTE IMPORTS
+const cardRouter = require("./routes/card-router");
 
 const app = express();
+// MIDDLEWARE
 // make sure cors() is at the top
 app.use(cors());
-
-// MIDDLEWARE
+// app.use(bearer);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 const morganOption = NODE_ENV === "production" ? "tiny" : "dev";
 if (NODE_ENV !== "production") {
   logger.add(
@@ -26,14 +32,11 @@ if (NODE_ENV !== "production") {
     })
   );
 }
-// if using bearer authorization
-// app.use(bearer)
-
 app.use(morgan(morganOption));
 app.use(helmet());
 
-// if using routes
-// app.use(exampleRouter)
+// ROUTES
+app.use("/api/cards", cardRouter);
 
 app.get("/", (req, res) => {
   res.send("hello boilerplate");

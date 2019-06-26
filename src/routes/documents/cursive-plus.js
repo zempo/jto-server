@@ -15,7 +15,7 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
           line-height: 1.5; 
           margin: 0;
           padding: 0;
-        }
+        } 
         .pg {
          max-width: 557px;
          font-family: 'Great Vibes', cursive;
@@ -59,12 +59,13 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
           text-align: center; 
         }
         #front-img {
-          height: 400px;
-          width: 600px;
+          height: 500px;
+          width: 400px;
         }
         #inside-img {
-          height: 400px;
-          width: 600px;
+          margin-top: 50px;
+          height: 350px;
+          width: 350px;
         }
       </style>
    </head>
@@ -73,12 +74,12 @@ module.exports = ({ theme, frontMessage, frontImage, insideMessage, insideImage 
      <section class="content">
      <div class="pg pg-front">
      <h2>${frontMessage}</h2>
-     <img src="${frontImage}" alt="front card image"/>
+     <img src="${frontImage}" alt="front card image" id="front-img" />
      </div> 
      <div class="spacer">1. Print --> 2. Cut --> 3. Paste</div>
      <div class="pg pg-inside">
      <p>${insideMessage}</p>
-     <img src="${insideImage}" alt="card image interior"/>
+     <img src="${insideImage}" alt="card image interior" id="inside-img" />
      </div>
      </section>
    </body>
