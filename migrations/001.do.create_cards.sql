@@ -15,7 +15,7 @@ CREATE TYPE theme AS ENUM (
 CREATE TABLE jto_cards (
 id SERIAL PRIMARY KEY,
 theme theme DEFAULT 'handwritten',
-front_message VARCHAR(35) NOT NULL,
+front_message VARCHAR(100) NOT NULL,
 front_image TEXT,
 inside_message VARCHAR(650) NOT NULL,
 inside_image TEXT,
