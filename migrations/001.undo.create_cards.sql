@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS jto_cards;
+DROP TYPE IF EXISTS theme;

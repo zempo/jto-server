@@ -1,0 +1,4 @@
+ALTER TABLE IF EXISTS jto_cards
+    DROP COLUMN user_id;
+
+DROP TABLE IF EXISTS jto_users;
