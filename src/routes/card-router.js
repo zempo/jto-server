@@ -24,14 +24,12 @@ const CardsService = require("../services/card-service");
 cardRouter
   .route("/")
   .get((req, res, next) => {
-    CardsService.getSomething(req.app.get('db')).then(data => res.send(data));
 
-    // CardsService.getPublicCards(req.app.get("db"))
-    //   .then((cards) => {
-    //     console.log(cards);
-    //     res.json(CardsService.serializeCards(cards));
-    //   })
-    //   .catch(next);
+    CardsService.getPublicCards(req.app.get("db"))
+      .then((cards) => {
+        res.json(CardsService.serializeCards(cards));
+      })
+      .catch(next);
   })
   .post((req, res) => {
     // pdf.create(cursivePlusTemplate(req.body), {}).toFile(`result.pdf`, (err) => {

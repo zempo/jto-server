@@ -2,7 +2,7 @@ const xss = require("xss");
 const Treeize = require("treeize");
 
 const CardsService = {
-  getSomething(db) {
+  getJustCards(db) {
     return db.from('jto_cards').select('*')
   },
   getPublicCards(db) {
@@ -22,7 +22,7 @@ const CardsService = {
         db.raw(`count(nullif(reacts.react_share, false)) AS number_of_shares`),
         db.raw(`count(DISTINCT comments) AS number_of_comments`)
       )
-      .leftJoin('jto_reacts AS reacts', 'card.id', 'react.card_id')
+      .leftJoin('jto_reacts AS reacts', 'card.id', 'reacts.card_id')
       .leftJoin('jto_comments AS comments', 'card.id', 'comments.card_id')
       .leftJoin('jto_users AS usr', 'card.user_id', 'usr.id')
       .where('card.public', true)
