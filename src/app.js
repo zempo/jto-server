@@ -39,7 +39,7 @@ app.use(helmet());
 app.use("/api/cards", cardRouter);
 
 app.get("/", (req, res) => {
-  res.send("hello boilerplate");
+  res.send("Just the Occasion");
 });
 
 app.use(errorCatch);
