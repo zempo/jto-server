@@ -19,20 +19,27 @@ const typed = require("./documents/typed");
 
 // setup
 const cardRouter = express.Router();
+const CardsService = require("../services/card-service");
 
 cardRouter
   .route("/")
-  .get((req, res) => {
-    let id = uuid();
-    res.send(id);
+  .get((req, res, next) => {
+    CardsService.getSomething(req.app.get('db')).then(data => res.send(data));
+
+    // CardsService.getPublicCards(req.app.get("db"))
+    //   .then((cards) => {
+    //     console.log(cards);
+    //     res.json(CardsService.serializeCards(cards));
+    //   })
+    //   .catch(next);
   })
   .post((req, res) => {
-    pdf.create(cursivePlusTemplate(req.body), {}).toFile(`result.pdf`, (err) => {
-      if (err) {
-        res.send(Promise.reject());
-      }
-      res.send(Promise.resolve());
-    });
+    // pdf.create(cursivePlusTemplate(req.body), {}).toFile(`result.pdf`, (err) => {
+    //   if (err) {
+    //     res.send(Promise.reject());
+    //   }
+    //   res.send(Promise.resolve());
+    // });
   });
 
 // cardRouter.route("/:cardId").get((req, res) => {});
