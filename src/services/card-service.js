@@ -28,27 +28,9 @@ const CardsService = {
       .where('card.public', true)
       .groupBy('card.id', 'usr.id');
   },
-  getPrivateCards(db, id) {
-    return db
-      .from('jto_cards AS cards')
-      .select(
-        'card.id',
-        'card.theme',
-        'card.front_message',
-        'card.front_image',
-        'card.inside_message',
-        'card.inside_image',
-        'card.date_created',
-        'card.public',
-        ...userFields
-      )
-      .leftJoin('jto_users AS usr', 'card.user_id', 'usr.id')
-      .where({
-        'usr.id': id,
-        'card.public': false
-      });
+  getPublicById(db, id) {
+    return CardsService.getPublicCards(db).where('card.id', id).first()
   },
-  getPublicById(id) { },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
   },
