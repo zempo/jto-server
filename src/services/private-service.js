@@ -4,6 +4,7 @@ const Treeize = require('treeize')
 const PrivateService = {
     getPrivateCards(db, id) {
         // if the user passes authentication, then their id will be used to display their cards
+        // cards can only be public or private
         return db
             .from('jto_cards AS card')
             .select(

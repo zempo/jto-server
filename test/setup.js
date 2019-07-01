@@ -1,7 +1,10 @@
 // for any testing databases
-process.env.TZ = 'UTC'
-require("dotenv").config();
+process.env.TZ = "UTC";
+process.env.NODE_ENV = "test";
+process.env.JWT_SECRET = "test-jwt-secret";
+process.env.JWT_EXPIRY = "5m";
 
+require("dotenv").config();
 const { expect } = require("chai");
 const supertest = require("supertest");
 
