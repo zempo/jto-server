@@ -7,27 +7,21 @@ const { isWebUri } = require("valid-url");
 const cardRouter = express.Router();
 const CardsService = require("../services/card-service");
 
-// No auth required 
+// No auth required
 cardRouter
   .route("/")
   .get((req, res, next) => {
-
     CardsService.getPublicCards(req.app.get("db"))
       .then((cards) => {
         res.json(CardsService.serializeCards(cards));
       })
       .catch(next);
   })
-  .post((req, res) => {
+  .post((req, res) => {});
 
-  });
-
-// Auth required 
-cardRouter.route("/:cardId").get((req, res, next) => {
-
-});
+// Auth required
+cardRouter.route("/:cardId").get((req, res, next) => {});
 
 module.exports = cardRouter;
 
 /////// PDF methods
-

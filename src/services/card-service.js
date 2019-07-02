@@ -3,33 +3,35 @@ const Treeize = require("treeize");
 
 const CardsService = {
   getJustCards(db) {
-    return db.from('jto_cards').select('*')
+    return db.from("jto_cards").select("*");
   },
   getPublicCards(db) {
     return db
-      .from('jto_cards AS card')
+      .from("jto_cards AS card")
       .select(
-        'card.id',
-        'card.theme',
-        'card.front_message',
-        'card.front_image',
-        'card.inside_message',
-        'card.inside_image',
-        'card.date_created',
-        'card.public',
+        "card.id",
+        "card.theme",
+        "card.front_message",
+        "card.front_image",
+        "card.inside_message",
+        "card.inside_image",
+        "card.date_created",
+        "card.public",
         ...userFields,
         db.raw(`count(nullif(reacts.react_heart, false)) AS number_of_hearts`),
         db.raw(`count(nullif(reacts.react_share, false)) AS number_of_shares`),
         db.raw(`count(DISTINCT comments) AS number_of_comments`)
       )
-      .leftJoin('jto_reacts AS reacts', 'card.id', 'reacts.card_id')
-      .leftJoin('jto_comments AS comments', 'card.id', 'comments.card_id')
-      .leftJoin('jto_users AS usr', 'card.user_id', 'usr.id')
-      .where('card.public', true)
-      .groupBy('card.id', 'usr.id');
+      .leftJoin("jto_reacts AS reacts", "card.id", "reacts.card_id")
+      .leftJoin("jto_comments AS comments", "card.id", "comments.card_id")
+      .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
+      .where("card.public", true)
+      .groupBy("card.id", "usr.id");
   },
   getPublicById(db, id) {
-    return CardsService.getPublicCards(db).where('card.id', id).first()
+    return CardsService.getPublicCards(db)
+      .where("card.id", id)
+      .first();
   },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
@@ -57,12 +59,12 @@ const CardsService = {
 };
 
 const userFields = [
-  'usr.id AS user:id',
-  'usr.user_name AS user:user_name',
-  'usr.full_name AS user:full_name',
-  'usr.email AS user:email',
-  'usr.date_created AS user:date_created',
-  'usr.date_modified AS user:date_modified'
+  "usr.id AS user:id",
+  "usr.user_name AS user:user_name",
+  "usr.full_name AS user:full_name",
+  "usr.email AS user:email",
+  "usr.date_created AS user:date_created",
+  "usr.date_modified AS user:date_modified"
 ];
 
 module.exports = CardsService;
