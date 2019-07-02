@@ -216,7 +216,25 @@ function makeReactsArray(users, cards) {
   ];
 }
 
-function makeNewCard(users, card, comments = [], reactions = []) {}
+function makeExpectedCard(users, card, comments = [], reacts = []) {
+    const user = users.find(user => user.id === card.user_id)
+
+    let hearts = 0
+    let shares = 0
+    const cardComments = comments.filter((comment) => comment.card_id === card.id)
+    const cardReacts = reacts.filter(reaction => {
+        if(reaction.card_id === card.id && reaction.react_heart) {
+            hearts += 1
+        } else if (reaction.card_id === card.id && reaction.react_share) {
+            shares += 1
+        }
+        // return shares and hearts?
+    })
+    const cardShares
+
+    const numberOfComments = cardComments.length
+    const numberOfHearts = cardReacts
+}
 
 function makeJtoFixtures() {
   const testUsers = makeUsersArray();
@@ -248,7 +266,7 @@ function seedUsers(db, users) {
     .then(() => db.raw(`SELECT setVal('jto_users_id_seq', ?)`, [users[users.length - 1].id]));
 }
 
-function seedCards(db, users, cards, comments = [], reacts = []) {
+function seedCardsTables(db, users, cards, comments = [], reacts = []) {
   return db
     .transaction(async (trx) => {
       await seedUsers(trx, users);
@@ -274,11 +292,11 @@ module.exports = {
   makeCardsArray,
   makeCommentsArray,
   makeReactsArray,
-  makeNewCard,
+  makeExpectedCard,
   makeJtoFixtures,
   cleanTables,
   seedUsers,
-  seedCards,
+  seedCardsTables,
   seedMaliciousCard,
   makeAuthHeader
 };

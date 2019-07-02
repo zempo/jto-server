@@ -1,38 +1,41 @@
-const knex = require('knex')
-const app = require('../src/app')
-const helpers = require('./test-helpers')
+const knex = require("knex");
+const app = require("../src/app");
+const helpers = require("./test-helpers");
 
-describe('Cards endpoints', () => {
-    let db;
+describe("Cards endpoints", () => {
+  let db;
 
-    const { } = helpers.makeCardsFixtures()
+  const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
 
-    before('Instantiate knex', () => {
-        db = knex({
-            client: 'pg',
-            connection: process.env.DB_TESTING_URL
-        });
-        app.set('db', db)
-    })
+  before("Instantiate knex", () => {
+    db = knex({
+      client: "pg",
+      connection: process.env.DB_TESTING_URL
+    });
+    app.set("db", db);
+  });
 
-    after('disconnect from db', () => db.destroy())
+  after("disconnect from db", () => db.destroy());
 
-    before('cleanup', () => helpers.cleanTables(db))
+  before("cleanup", () => helpers.cleanTables(db));
 
-    afterEach('cleanup', () => helpers.cleanTables(db))
+  afterEach("cleanup", () => helpers.cleanTables(db));
 
-    describe(`GET /api/cards`, () => {
-        context(`Given no public cards`, () => {
-            it(`Responds with 200 and an empty list`, () => {
-                return supertest(app)
-                    .get('/api/cards')
-                    .expect(200, [])
-            })
-        })
+  describe(`GET /api/cards`, () => {
+    context(`Given no public cards`, () => {
+      it(`Responds with 200 and an empty list`, () => {
+        return supertest(app)
+          .get("/api/cards")
+          .expect(200, []);
+      });
+    });
 
-        context(`Given existing public cards`, () => {
-            beforeEach('insert cards', () => helpers.seedCardsTables())
-        })
-    })
+    context(`Given existing public cards`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-})
+      it("Responds with 200 and all public cards", () => {
+        const expectedCards = testCards.map((card) => helpers.makeExpectedCard);
+      });
+    });
+  });
+});
