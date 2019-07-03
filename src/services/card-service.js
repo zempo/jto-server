@@ -6,6 +6,7 @@ const CardsService = {
     return db.from("jto_cards").select("*");
   },
   getPublicCards(db) {
+
     return db
       .from("jto_cards AS card")
       .select(
@@ -18,12 +19,12 @@ const CardsService = {
         "card.date_created",
         "card.public",
         ...userFields,
-        db.raw(`count(nullif(reacts.react_heart, FALSE)) AS number_of_hearts`),
-        db.raw(`count(nullif(reacts.react_share, FALSE)) AS number_of_shares`),
+        db.raw(`count(nullif(reacts.react_heart, false)) AS number_of_hearts`),
+        db.raw(`count(nullif(reacts.react_share, false)) AS number_of_shares`),
         db.raw(`count(DISTINCT comments) AS number_of_comments`)
       )
-      .leftJoin("jto_reacts AS reacts", "card.id", "reacts.card_id")
-      .leftJoin("jto_comments AS comments", "card.id", "comments.card_id")
+      .leftJoin("jto_reacts AS reacts", "reacts.card_id", "card.id")
+      .leftJoin("jto_comments AS comments", "comments.card_id", "card.id")
       .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where("card.public", true)
       .groupBy("card.id", "usr.id");
