@@ -219,17 +219,21 @@ function makeReactsArray(users, cards) {
 function makeExpectedCard(users, card, comments = [], reacts = []) {
   const user = users.find((user) => user.id === card.user_id);
 
-  let number_of_hearts = 0;
-  let number_of_shares = 0;
   const cardComments = comments.filter((comment) => comment.card_id === card.id);
-  reacts.filter((reaction) => {
+  const hearts = reacts.filter((reaction) => {
+    console.log(reaction)
     if (reaction.card_id === card.id && reaction.react_heart) {
-      number_of_hearts += 1;
-    } else if (reaction.card_id === card.id && reaction.react_share) {
-      number_of_shares += 1;
+      return true
     }
   });
+  const shares = reacts.filter((reaction) => {
+    if (reaction.card_id === card.id && reaction.react_share) {
+      return true
+    }
+  })
   const number_of_comments = cardComments.length;
+  const number_of_hearts = hearts.length;
+  const number_of_shares = shares.length;
 
   return {
     id: card.id,
@@ -275,14 +279,15 @@ function cleanTables(db) {
 }
 
 function seedUsers(db, users) {
-  const preppedUsers = users.map((user) => ({
-    ...user,
-    password: bcrypt.hashSync(user.password, 10)
-  }));
+  // const preppedUsers = users.map((user) => ({
+  //   ...user,
+  //   password: bcrypt.hashSync(user.password, 10)
+  // }));
   // console.log(preppedUsers);
+  // .insert(preppedUsers) into the users db
   return db
     .into("jto_users")
-    .insert(preppedUsers)
+    .insert(users)
     .then(() => db.raw(`SELECT setVal('jto_users_id_seq', ?)`, [users[users.length - 1].id]));
 }
 

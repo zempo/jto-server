@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Cards endpoints", function() {
+describe("Cards endpoints", function () {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
@@ -34,13 +34,15 @@ describe("Cards endpoints", function() {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it("Responds with 200 and all public cards", () => {
-        const expectedCards = testCards.map((card, i, cards) => {
-          console.log(card["public"]);
+        const expectedCards = testCards.filter((card, i, cards) => {
+          // console.log(card["public"]);
           if (card["public"] == true) {
-            return helpers.makeExpectedCard(testUsers, card, testComments, testReacts);
+            return true
           } else {
-            return false;
+            return false
           }
+        }).map(card => {
+          return helpers.makeExpectedCard(testUsers, card, testComments, testReacts);
         });
         // console.log(expectedCards);
         return supertest(app)
