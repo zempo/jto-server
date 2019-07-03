@@ -49,8 +49,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "TRUE",
-      user_id: users[2].id
+      public: true,
+      user_id: users[1].id
     },
     {
       id: 2,
@@ -61,8 +61,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "TRUE",
-      user_id: users[3].id
+      public: true,
+      user_id: users[2].id
     },
     {
       id: 3,
@@ -73,8 +73,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "FALSE",
-      user_id: users[1].id
+      public: false,
+      user_id: users[0].id
     },
     {
       id: 4,
@@ -85,8 +85,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "FALSE",
-      user_id: users[1].id
+      public: false,
+      user_id: users[0].id
     },
     {
       id: 5,
@@ -97,8 +97,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "TRUE",
-      user_id: users[1].id
+      public: true,
+      user_id: users[0].id
     },
     {
       id: 6,
@@ -109,8 +109,8 @@ function makeCardsArray(users) {
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
       inside_image: "https://loremflickr.com/g/300/300/flowers",
       date_created: "2029-01-22T16:28:32.615Z",
-      public: "TRUE",
-      user_id: users[4].id
+      public: true,
+      user_id: users[3].id
     }
   ];
 }
@@ -121,50 +121,50 @@ function makeCommentsArray(users, cards) {
       id: 1,
       body: "comment 1",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[1].id,
-      card_id: cards[2].id
+      user_id: users[0].id,
+      card_id: cards[1].id
     },
     {
       id: 2,
       body: "comment 2",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[2].id,
-      card_id: cards[2].id
+      user_id: users[1].id,
+      card_id: cards[1].id
     },
     {
       id: 3,
       body: "comment 3",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[4].id,
-      card_id: cards[1].id
+      user_id: users[3].id,
+      card_id: cards[0].id
     },
     {
       id: 4,
       body: "comment 4",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[3].id,
-      card_id: cards[5].id
+      user_id: users[2].id,
+      card_id: cards[4].id
     },
     {
       id: 5,
       body: "comment 5",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[3].id,
-      card_id: cards[6].id
+      user_id: users[2].id,
+      card_id: cards[5].id
     },
     {
       id: 6,
       body: "comment 6",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[3].id,
-      card_id: cards[3].id
+      user_id: users[2].id,
+      card_id: cards[2].id
     },
     {
       id: 7,
       body: "comment 7",
       date_created: "2029-01-22T16:28:32.615Z",
-      user_id: users[1].id,
-      card_id: cards[4].id
+      user_id: users[0].id,
+      card_id: cards[3].id
     }
   ];
 }
@@ -172,44 +172,44 @@ function makeCommentsArray(users, cards) {
 function makeReactsArray(users, cards) {
   return [
     {
+      user_id: users[0].id,
+      card_id: cards[1].id,
+      react_heart: false,
+      react_share: true
+    },
+    {
       user_id: users[1].id,
-      card_id: cards[2].id,
+      card_id: cards[1].id,
+      react_heart: true,
+      react_share: true
+    },
+    {
+      user_id: users[3].id,
+      card_id: cards[0].id,
+      react_heart: false,
+      react_share: false
+    },
+    {
+      user_id: users[2].id,
+      card_id: cards[4].id,
       react_heart: false,
       react_share: true
     },
     {
       user_id: users[2].id,
-      card_id: cards[2].id,
-      react_heart: true,
-      react_share: true
-    },
-    {
-      user_id: users[4].id,
-      card_id: cards[1].id,
-      react_heart: false,
-      react_share: false
-    },
-    {
-      user_id: users[3].id,
       card_id: cards[5].id,
-      react_heart: false,
-      react_share: true
-    },
-    {
-      user_id: users[3].id,
-      card_id: cards[6].id,
       react_heart: true,
       react_share: true
     },
     {
-      user_id: users[4].id,
-      card_id: cards[3].id,
+      user_id: users[3].id,
+      card_id: cards[2].id,
       react_heart: false,
       react_share: true
     },
     {
-      user_id: users[1].id,
-      card_id: cards[4].id,
+      user_id: users[0].id,
+      card_id: cards[3].id,
       react_heart: true,
       react_share: true
     }
@@ -217,23 +217,41 @@ function makeReactsArray(users, cards) {
 }
 
 function makeExpectedCard(users, card, comments = [], reacts = []) {
-    const user = users.find(user => user.id === card.user_id)
+  const user = users.find((user) => user.id === card.user_id);
 
-    let hearts = 0
-    let shares = 0
-    const cardComments = comments.filter((comment) => comment.card_id === card.id)
-    const cardReacts = reacts.filter(reaction => {
-        if(reaction.card_id === card.id && reaction.react_heart) {
-            hearts += 1
-        } else if (reaction.card_id === card.id && reaction.react_share) {
-            shares += 1
-        }
-        // return shares and hearts?
-    })
-    const cardShares
+  let number_of_hearts = 0;
+  let number_of_shares = 0;
+  const cardComments = comments.filter((comment) => comment.card_id === card.id);
+  reacts.filter((reaction) => {
+    if (reaction.card_id === card.id && reaction.react_heart) {
+      number_of_hearts += 1;
+    } else if (reaction.card_id === card.id && reaction.react_share) {
+      number_of_shares += 1;
+    }
+  });
+  const number_of_comments = cardComments.length;
 
-    const numberOfComments = cardComments.length
-    const numberOfHearts = cardReacts
+  return {
+    id: card.id,
+    theme: card.theme,
+    front_message: card.front_message,
+    front_image: card.front_image,
+    inside_message: card.inside_message,
+    inside_image: card.inside_image,
+    date_created: card.date_created,
+    number_of_comments,
+    number_of_hearts,
+    number_of_shares,
+    public: card.public,
+    user: {
+      id: user.id,
+      user_name: user.user_name,
+      full_name: user.full_name,
+      email: user.email,
+      password: user.password,
+      date_created: user.date_created
+    }
+  };
 }
 
 function makeJtoFixtures() {
@@ -241,6 +259,7 @@ function makeJtoFixtures() {
   const testCards = makeCardsArray(testUsers);
   const testComments = makeCommentsArray(testUsers, testCards);
   const testReacts = makeReactsArray(testUsers, testCards);
+
   return { testUsers, testCards, testComments, testReacts };
 }
 
@@ -260,6 +279,7 @@ function seedUsers(db, users) {
     ...user,
     password: bcrypt.hashSync(user.password, 10)
   }));
+  // console.log(preppedUsers);
   return db
     .into("jto_users")
     .insert(preppedUsers)
@@ -277,8 +297,6 @@ function seedCardsTables(db, users, cards, comments = [], reacts = []) {
     .then(() => reacts.length && db.into("jto_reacts").insert(reacts));
 }
 
-function seedMaliciousCard(db, user, card) {}
-
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.user_name,
@@ -290,13 +308,12 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 module.exports = {
   makeUsersArray,
   makeCardsArray,
+  makeExpectedCard,
   makeCommentsArray,
   makeReactsArray,
-  makeExpectedCard,
   makeJtoFixtures,
   cleanTables,
   seedUsers,
   seedCardsTables,
-  seedMaliciousCard,
   makeAuthHeader
 };
