@@ -18,8 +18,8 @@ const CardsService = {
         "card.date_created",
         "card.public",
         ...userFields,
-        db.raw(`count(nullif(reacts.react_heart, false)) AS number_of_hearts`),
-        db.raw(`count(nullif(reacts.react_share, false)) AS number_of_shares`),
+        db.raw(`count(nullif(reacts.react_heart, FALSE)) AS number_of_hearts`),
+        db.raw(`count(nullif(reacts.react_share, FALSE)) AS number_of_shares`),
         db.raw(`count(DISTINCT comments) AS number_of_comments`)
       )
       .leftJoin("jto_reacts AS reacts", "card.id", "reacts.card_id")

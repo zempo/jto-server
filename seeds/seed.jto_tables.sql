@@ -29,7 +29,7 @@ INSERT INTO jto_comments
     ('I miss my mum!', 1, 2),
     ('Awww! So cute!', 2, 3), 
     ('Haha! This made me chuckle!', 3, 2),
-    ('Gotta celebrate those good times!', 4, 2),
+    ('Gotta celebrate those good times!', 4, 2), 
     ('Agreed! Quite cute, indeed!', 2, 1);
 
 INSERT INTO jto_reacts
