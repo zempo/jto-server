@@ -25,6 +25,9 @@ const PrivateService = {
       })
       .groupBy("card.id", "usr.id");
   },
+  privateToPublic(db, user_id, card_id) {
+    console.log('hello');
+  },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
   },

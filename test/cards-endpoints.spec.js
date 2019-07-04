@@ -33,7 +33,7 @@ describe("Cards endpoints", function () {
     context(`Given existing public cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it("Responds with 200 and all public cards", () => {
+      it(`Responds with 200 and all public cards`, () => {
         const expectedCards = testCards.filter((card, i, cards) => {
           // console.log(card["public"]);
           // first filter to simulate a query
@@ -56,4 +56,18 @@ describe("Cards endpoints", function () {
       });
     });
   });
+
+  describe(`GET a public card at api/card/:card_id`, () => {
+    context(`Given a public card with a non-existent id`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 404`, () => {
+        let card_id = 999999042
+        return supertest(app)
+          .get(`/api/cards/${card_id}`)
+          .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` })
+      })
+    })
+  })
+
 });
