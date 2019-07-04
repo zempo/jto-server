@@ -23,12 +23,11 @@ describe("Protected endpoints", function () {
 
   // beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-  describe(`GET user's private cards at /api/private/:user_id`, () => {
-
-    context(`Given a user has private cards`, () => {
+  describe(`GET all reaction counts /api/reactions/`, () => {
+    context(`Given there are public cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it("Responds with 200 and all public cards", () => {
+      it("Returns accurate card reaction counts for all cards", () => {
         const expectedCards = testCards.filter((card, i, cards) => {
           if (card["public"] == true) {
             return true
@@ -36,7 +35,7 @@ describe("Protected endpoints", function () {
             return false
           }
         }).map(card => {
-          return helpers.makeExpectedReactions(card, testReacts, 1);
+          return helpers.makeExpectedReactions(card, testReacts);
         });
         // console.log(expectedCards);
         return supertest(app)
@@ -45,4 +44,38 @@ describe("Protected endpoints", function () {
       });
     });
   });
+
+  describe(`GET the reactions of a single card`, () => {
+    context(`Given a public card doesn't exist or isn't public`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 404 because it doesn't exist`, () => {
+        let card_id = 999999042
+        return supertest(app)
+          .get(`/api/reactions/${card_id}`)
+          .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` })
+      })
+
+      it(`Responds with 404 because it isn't public`, () => {
+        let card_id = 4
+        return supertest(app)
+          .get(`/api/reactions/${card_id}`)
+          .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` })
+      })
+
+    })
+
+    context(`Given a public card that exists`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 200 and card`, () => {
+        let card_id = 1
+        const expectedCard = helpers.makeExpectedReactions(testCards[card_id - 1], testReacts)
+        return supertest(app)
+          .get(`/api/reactions/${card_id}`)
+          .expect(200, expectedCard)
+      })
+    })
+  })
+
 });

@@ -13,6 +13,7 @@ const ReactionsService = {
                 "card.inside_message",
                 "card.inside_image",
                 "card.date_created",
+                "card.user_id",
                 "card.public",
                 db.raw(`count(nullif(reacts.react_heart, false)) AS number_of_hearts`),
                 db.raw(`count(nullif(reacts.react_share, false)) AS number_of_shares`)
@@ -21,6 +22,12 @@ const ReactionsService = {
             .where("card.public", true)
             .groupBy("card.id")
             .orderBy("card.id");
+    },
+    getCardReactions(db, id) {
+        return ReactionsService
+            .getPublicReactions(db)
+            .where("card.id", id)
+            .first();
     },
     serializeReactions(cards) {
         return cards.map(this.serializeReaction)
@@ -38,6 +45,7 @@ const ReactionsService = {
             inside_message: xss(cardData.inside_message),
             inside_image: xss(cardData.inside_image),
             date_created: cardData.date_created,
+            user_id: card.user_id,
             public: cardData.public,
             number_of_hearts: Number(cardData.number_of_hearts) || 0,
             number_of_shares: Number(cardData.number_of_shares) || 0

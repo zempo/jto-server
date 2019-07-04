@@ -58,16 +58,37 @@ describe("Cards endpoints", function () {
   });
 
   describe(`GET a public card at api/card/:card_id`, () => {
-    context(`Given a public card with a non-existent id`, () => {
+    context(`Given a public card doesn't exist or isn't public`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it(`Responds with 404`, () => {
+      it(`Responds with 404 because it doesn't exist`, () => {
         let card_id = 999999042
         return supertest(app)
           .get(`/api/cards/${card_id}`)
           .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` })
       })
+
+      it(`Responds with 404 because it isn't public`, () => {
+        let card_id = 4
+        return supertest(app)
+          .get(`/api/cards/${card_id}`)
+          .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` })
+      })
+
     })
+
+    context(`Given a public card that exists`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 200 and card`, () => {
+        let card_id = 1
+        const expectedCard = helpers.makeExpectedCard(testUsers, testCards[card_id - 1], testComments)
+        return supertest(app)
+          .get(`/api/cards/${card_id}`)
+          .expect(200, expectedCard)
+      })
+    })
+
   })
 
 });

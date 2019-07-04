@@ -21,6 +21,28 @@ reactionsRouter
 
 // Auth required
 // posting a reaction to a particular card with a particular id
-reactionsRouter.route("/:cardId").get((req, res, next) => { });
+reactionsRouter
+    .route("/:card_id")
+    .all(checkCardExists)
+    .get((req, res) => {
+        res.json(ReactionsService.serializeReaction(res.card))
+    });
+
+/* async/await syntax for promises */
+async function checkCardExists(req, res, next) {
+    try {
+        const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
+
+        if (!card)
+            return res.status(404).json({
+                error: `This public card no longer exists. It might have been deleted or made private.`
+            });
+
+        res.card = card;
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
 
 module.exports = reactionsRouter;

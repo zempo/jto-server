@@ -288,6 +288,7 @@ function makeExpectedReactions(card, reacts = []) {
     inside_message: card.inside_message,
     inside_image: card.inside_image,
     date_created: card.date_created,
+    user_id: card.user_id,
     public: card.public,
     number_of_hearts,
     number_of_shares
