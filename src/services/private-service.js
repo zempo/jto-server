@@ -41,8 +41,8 @@ const PrivateService = {
       )
       .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where({
-        "usr.id": user_id,
         "card.id": card_id,
+        "usr.id": user_id,
         "card.public": false
       })
       .groupBy("card.id", "usr.id");

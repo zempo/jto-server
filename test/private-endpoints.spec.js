@@ -50,7 +50,7 @@ describe("Endpoints for a user's own cards", function () {
     context(`Given a user has private cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it("Responds with 200 and all a given user's private cards", () => {
+      it(`Responds with 200 and all a given user's private cards`, () => {
         let userToQuery = 1
         const expectedCards = testCards.filter((card, i, cards) => {
           // console.log(userToQuery)
@@ -70,4 +70,31 @@ describe("Endpoints for a user's own cards", function () {
       });
     });
   });
+
+  describe(`GET a single private card at /api/private/cards/:user_id/:card_id`, () => {
+    context(`Given a user's private card has been moved or deleted`, () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with a 404 and error message.`, () => {
+        let userToQuery = 1
+        let cardToQuery = 999999042
+        const expectedCard = testCards.filter((card, i, cards) => {
+          // console.log(userToQuery)
+          if (card["public"] == false && card["user_id"] == userToQuery && card["id"] == cardToQuery) {
+            return true
+          } else {
+            return false
+          }
+        }).map(card => {
+          // console.log(helpers.makeExpectedPrivateCard(testUsers, card));
+          return helpers.makeExpectedPrivateCard(testUsers, card);
+        });
+        // console.log(expectedCard);
+        return supertest(app)
+          .get(`/api/private/cards/${userToQuery}/${cardToQuery}`)
+          .expect(404, { error: `This card is no longer private. It might have been deleted or made public.` });
+      })
+    })
+  })
+
 });
