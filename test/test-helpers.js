@@ -220,20 +220,7 @@ function makeExpectedCard(users, card, comments = []) {
   const user = users.find((user) => user.id === card.user_id);
 
   const cardComments = comments.filter((comment) => comment.card_id === card.id);
-  // const hearts = reacts.filter((reaction) => {
-  //   console.log(reaction)
-  //   if (reaction.card_id === card.id && reaction.react_heart) {
-  //     return true
-  //   }
-  // });
-  // const shares = reacts.filter((reaction) => {
-  //   if (reaction.card_id === card.id && reaction.react_share) {
-  //     return true
-  //   }
-  // })
   const number_of_comments = cardComments.length;
-  // const number_of_hearts = hearts.length;
-  // const number_of_shares = shares.length;
 
   return {
     id: card.id,
@@ -253,6 +240,57 @@ function makeExpectedCard(users, card, comments = []) {
       password: user.password,
       date_created: user.date_created
     }
+  };
+}
+
+function makeExpectedPrivateCard(users, card) {
+  const user = users.find((user) => user.id === card.user_id);
+  return {
+    id: card.id,
+    theme: card.theme,
+    front_message: card.front_message,
+    front_image: card.front_image,
+    inside_message: card.inside_message,
+    inside_image: card.inside_image,
+    date_created: card.date_created,
+    public: card.public,
+    user: {
+      id: user.id,
+      user_name: user.user_name,
+      full_name: user.full_name,
+      email: user.email,
+      password: user.password,
+      date_created: user.date_created
+    }
+  };
+}
+
+function makeExpectedReactions(card, reacts = []) {
+  const hearts = reacts.filter((reaction) => {
+    // console.log(reaction)
+    if (reaction.card_id === card.id && reaction.react_heart) {
+      return true
+    }
+  });
+  const shares = reacts.filter((reaction) => {
+    if (reaction.card_id === card.id && reaction.react_share) {
+      return true
+    }
+  })
+  const number_of_hearts = hearts.length;
+  const number_of_shares = shares.length;
+
+  return {
+    id: card.id,
+    theme: card.theme,
+    front_message: card.front_message,
+    front_image: card.front_image,
+    inside_message: card.inside_message,
+    inside_image: card.inside_image,
+    date_created: card.date_created,
+    public: card.public,
+    number_of_hearts,
+    number_of_shares
   };
 }
 
@@ -312,6 +350,8 @@ module.exports = {
   makeUsersArray,
   makeCardsArray,
   makeExpectedCard,
+  makeExpectedPrivateCard,
+  makeExpectedReactions,
   makeCommentsArray,
   makeReactsArray,
   makeJtoFixtures,

@@ -11,7 +11,7 @@ const PrivateService = require("../services/private-service");
 privateRouter.route("/:user_id").get((req, res, next) => {
   PrivateService.getPrivateCards(req.app.get("db"), req.params.user_id)
     .then((cards) => {
-      res.json(cards);
+      res.json(PrivateService.serializeCards(cards));
     })
     .catch(next);
 });

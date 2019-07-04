@@ -16,12 +16,14 @@ const PrivateService = {
         "card.inside_image",
         "card.date_created",
         "card.public",
-        "card.user_id"
+        ...userFields,
       )
+      .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where({
-        "card.user_id": id,
+        "usr.id": id,
         "card.public": false
-      });
+      })
+      .groupBy("card.id", "usr.id");
   },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
@@ -39,7 +41,8 @@ const PrivateService = {
       inside_message: xss(cardData.inside_message),
       inside_image: xss(cardData.inside_image),
       date_created: cardData.date_created,
-      public: cardData.public
+      public: cardData.public,
+      user: cardData.user || {}
     };
   }
 };
@@ -49,6 +52,7 @@ const userFields = [
   "usr.user_name AS user:user_name",
   "usr.full_name AS user:full_name",
   "usr.email AS user:email",
+  "usr.password AS user:password",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
 ];
