@@ -24,6 +24,7 @@ describe("Protected endpoints", function () {
   // beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
   describe(`GET all reaction counts /api/reactions/`, () => {
+    after("spacing", () => console.log('-------------------------------------\n'))
     context(`Given there are public cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
@@ -46,6 +47,7 @@ describe("Protected endpoints", function () {
   });
 
   describe(`GET the reactions of a single card`, () => {
+    after("spacing", () => console.log('-------------------------------------\n'))
     context(`Given a public card doesn't exist or isn't public`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 

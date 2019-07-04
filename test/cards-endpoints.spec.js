@@ -22,6 +22,7 @@ describe("Cards endpoints", function () {
   afterEach("cleanup", () => helpers.cleanTables(db));
 
   describe(`GET public cards at /api/cards`, () => {
+    after("spacing", () => console.log('-------------------------------------\n'))
     context(`Given no public cards`, () => {
       it(`Responds with 200 and an empty list`, () => {
         return supertest(app)
@@ -58,6 +59,7 @@ describe("Cards endpoints", function () {
   });
 
   describe(`GET a public card at api/card/:card_id`, () => {
+    after("spacing", () => console.log('-------------------------------------\n'))
     context(`Given a public card doesn't exist or isn't public`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
