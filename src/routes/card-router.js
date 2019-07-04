@@ -20,15 +20,16 @@ cardRouter
   .post((req, res) => { });
 
 // Auth required
+// post new card --> get cards 
+// get cards --> delete card --> get cards
+// get cards --> click card edit --> get card --> populate form values --> patch card --> get cards 
+// get cards --> click make private --> recieve notificaton --> patch card public to false --> get cards, card should be missing 
+
 cardRouter
   .route("/:card_id")
   .all(checkCardExists)
   .get((req, res) => {
     res.json(CardsService.serializeCard(res.card))
-    // CardsService.getPublicById(req.app.get("db"), req.params.card_id)
-    //   .then((card) => {
-    //     // console.log(cards)
-    //   })
   });
 
 /* async/await syntax for promises */

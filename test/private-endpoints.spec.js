@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Endpoints for a user's own cards", function () {
+describe("Endpoints for a user's private cards", function () {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
