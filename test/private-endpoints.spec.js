@@ -23,7 +23,7 @@ describe("Endpoints for a user's own cards", function () {
 
   // beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-  describe(`GET user's private cards at /api/private/:user_id`, () => {
+  describe(`GET user's private cards at /api/private/cards/:user_id`, () => {
     context(`Given a user without private cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
@@ -42,7 +42,7 @@ describe("Endpoints for a user's own cards", function () {
         });
         // console.log(expectedCards);
         return supertest(app)
-          .get(`/api/private/${userToQuery}`)
+          .get(`/api/private/cards/${userToQuery}`)
           .expect(200, []);
       });
     });
@@ -65,7 +65,7 @@ describe("Endpoints for a user's own cards", function () {
         });
         // console.log(expectedCards);
         return supertest(app)
-          .get(`/api/private/${userToQuery}`)
+          .get(`/api/private/cards/${userToQuery}`)
           .expect(200, expectedCards);
       });
     });
