@@ -2,7 +2,7 @@ const xss = require("xss");
 const Treeize = require("treeize");
 
 const PrivateService = {
-  getPrivateCards(db, id) {
+  getPrivateCards(db, user_id) {
     // if the user passes authentication, then their id will be used to display their cards
     // cards can only be public or private
     return db
@@ -20,7 +20,29 @@ const PrivateService = {
       )
       .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where({
-        "usr.id": id,
+        "usr.id": user_id,
+        "card.public": false
+      })
+      .groupBy("card.id", "usr.id");
+  },
+  getPrivateById(db, user_id, card_id) {
+    return db
+      .from("jto_cards AS card")
+      .select(
+        "card.id",
+        "card.theme",
+        "card.front_message",
+        "card.front_image",
+        "card.inside_message",
+        "card.inside_image",
+        "card.date_created",
+        "card.public",
+        ...userFields,
+      )
+      .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
+      .where({
+        "usr.id": user_id,
+        "card.id": card_id,
         "card.public": false
       })
       .groupBy("card.id", "usr.id");
