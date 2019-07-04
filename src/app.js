@@ -16,7 +16,8 @@ const winston = require("winston");
 
 // ROUTE IMPORTS
 const cardRouter = require("./routes/card-router");
-const privateRouter = require('./routes/private-router')
+const privateRouter = require('./routes/private-router');
+const reactionsRouter = require('./routes/reactions-router')
 
 const app = express();
 // MIDDLEWARE
@@ -38,7 +39,8 @@ app.use(helmet());
 
 // ROUTES
 app.use("/api/cards", cardRouter);
-app.use('/api/private', privateRouter)
+app.use("/api/private", privateRouter)
+app.use("/api/reactions", reactionsRouter)
 
 app.get("/", (req, res) => {
   res.send("Just the Occasion");

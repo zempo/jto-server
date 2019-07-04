@@ -42,7 +42,7 @@ describe("Cards endpoints", function () {
             return false
           }
         }).map(card => {
-          return helpers.makeExpectedCard(testUsers, card, testComments, testReacts);
+          return helpers.makeExpectedCard(testUsers, card, testComments);
         });
         // console.log(expectedCards);
         return supertest(app)

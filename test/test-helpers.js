@@ -216,24 +216,24 @@ function makeReactsArray(users, cards) {
   ];
 }
 
-function makeExpectedCard(users, card, comments = [], reacts = []) {
+function makeExpectedCard(users, card, comments = []) {
   const user = users.find((user) => user.id === card.user_id);
 
   const cardComments = comments.filter((comment) => comment.card_id === card.id);
-  const hearts = reacts.filter((reaction) => {
-    console.log(reaction)
-    if (reaction.card_id === card.id && reaction.react_heart) {
-      return true
-    }
-  });
-  const shares = reacts.filter((reaction) => {
-    if (reaction.card_id === card.id && reaction.react_share) {
-      return true
-    }
-  })
+  // const hearts = reacts.filter((reaction) => {
+  //   console.log(reaction)
+  //   if (reaction.card_id === card.id && reaction.react_heart) {
+  //     return true
+  //   }
+  // });
+  // const shares = reacts.filter((reaction) => {
+  //   if (reaction.card_id === card.id && reaction.react_share) {
+  //     return true
+  //   }
+  // })
   const number_of_comments = cardComments.length;
-  const number_of_hearts = hearts.length;
-  const number_of_shares = shares.length;
+  // const number_of_hearts = hearts.length;
+  // const number_of_shares = shares.length;
 
   return {
     id: card.id,
@@ -244,8 +244,6 @@ function makeExpectedCard(users, card, comments = [], reacts = []) {
     inside_image: card.inside_image,
     date_created: card.date_created,
     number_of_comments,
-    number_of_hearts,
-    number_of_shares,
     public: card.public,
     user: {
       id: user.id,
