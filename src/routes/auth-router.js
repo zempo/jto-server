@@ -15,30 +15,30 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
                 error: `Missing '${key}' in request body`
             });
         }
-
-        AuthService.getUserWithUserName(req.app.get("db"), loginUser.user_name)
-            .then((dbUser) => {
-                if (!dbUser) {
-                    return res.status(400).json({
-                        error: "Incorrect user_name or password"
-                    });
-                }
-                return AuthService.comparePasswords(loginUser.password, dbUser.password)
-                    .then((matching) => {
-                        if (!matching) {
-                            return res.status(400).json({
-                                error: "Incorrect user_name or password"
-                            });
-                        }
-                        const sub = dbUser.user_name;
-                        const payload = { user_id: dbUser.id }
-                        res.send({
-                            authToken: AuthService.createJwt(sub, payload)
-                        });
-                    })
-                    .catch(next)
-            })
     }
+
+    AuthService.getUserWithUserName(req.app.get("db"), loginUser.user_name)
+        .then((dbUser) => {
+            if (!dbUser) {
+                return res.status(400).json({
+                    error: "Incorrect user_name or password"
+                });
+            }
+            return AuthService.comparePasswords(loginUser.password, dbUser.password)
+                .then((matching) => {
+                    if (!matching) {
+                        return res.status(400).json({
+                            error: "Incorrect user_name or password"
+                        });
+                    }
+                    const sub = dbUser.user_name;
+                    const payload = { user_id: dbUser.id }
+                    res.send({
+                        authToken: AuthService.createJwt(sub, payload)
+                    });
+                })
+                .catch(next)
+        })
 })
 
 authRouter.post("/refresh", requireAuth, (req, res) => {
@@ -47,7 +47,7 @@ authRouter.post("/refresh", requireAuth, (req, res) => {
 
     res.send({
         authToken: AuthService.createJwt(sub, payload)
-    })
+    }).end()
 })
 
 module.exports = authRouter

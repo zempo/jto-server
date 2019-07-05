@@ -41,7 +41,7 @@ const CommentsService = {
                 return comment
             })
             .then((comment) => {
-                console.log(comment["id"])
+                // console.log(comment["id"])
                 return CommentsService.getById(db, comment.id)
             })
     },

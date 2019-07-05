@@ -24,6 +24,7 @@ describe("Auth Endpoints", function () {
     afterEach("cleanup", () => helpers.cleanTables(db));
 
     describe(`POST /api/auth/login`, () => {
+        after("spacing", () => console.log('-------------------------------------\n'))
         beforeEach("insert users", () => helpers.seedUsers(db, testUsers));
 
         const requiredFields = ["user_name", "password"];
@@ -82,9 +83,6 @@ describe("Auth Endpoints", function () {
                 .send(userValidCreds)
                 .expect(200, {
                     authToken: expectedToken
-                })
-                .expect(res => {
-                    console.log(res.body)
                 });
         });
     });
@@ -92,12 +90,16 @@ describe("Auth Endpoints", function () {
     describe(`POST /api/auth/refresh`, () => {
         beforeEach("insert users", () => helpers.seedUsers(db, testUsers));
 
+        after("spacing", () => console.log('-------------------------------------\n'))
+
         it(`responds 200 and JWT auth token using secret`, () => {
+            const testUser = testUsers[0];
             const expectedToken = jwt.sign({ user_id: testUser.id }, process.env.JWT_SECRET, {
                 subject: testUser.user_name,
                 expiresIn: process.env.JWT_EXPIRY,
                 algorithm: "HS256"
             });
+            console.log(testUser)
             return supertest(app)
                 .post("/api/auth/refresh")
                 .set("Authorization", helpers.makeAuthHeader(testUser))
