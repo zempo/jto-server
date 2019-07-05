@@ -265,6 +265,29 @@ function makeExpectedPrivateCard(users, card) {
   };
 }
 
+function makeExpectedComments(users, card_id, comments) {
+  const expectedComments = comments.filter((comment) => comment.card_id === card_id)
+
+  return expectedComments.map((comment) => {
+    const commentUser = users.find((user) => user.id === comment.user_id)
+    return {
+      id: comment.id,
+      body: comment.body,
+      date_created: comment.date_created,
+      card_id: comment.card_id,
+      user: {
+        id: commentUser.id,
+        user_name: commentUser.user_name,
+        full_name: commentUser.full_name,
+        password: commentUser.password,
+        email: commentUser.email,
+        date_created: commentUser.date_created,
+        date_modified: commentUser.date_modified
+      }
+    }
+  })
+}
+
 function makeExpectedReactions(card, reacts = []) {
   const hearts = reacts.filter((reaction) => {
     // console.log(reaction)
@@ -316,15 +339,15 @@ function cleanTables(db) {
 }
 
 function seedUsers(db, users) {
-  // const preppedUsers = users.map((user) => ({
-  //   ...user,
-  //   password: bcrypt.hashSync(user.password, 10)
-  // }));
+  const preppedUsers = users.map((user) => ({
+    ...user,
+    password: bcrypt.hashSync(user.password, 10)
+  }));
   // console.log(preppedUsers);
   // .insert(preppedUsers) into the users db
   return db
     .into("jto_users")
-    .insert(users)
+    .insert(preppedUsers)
     .then(() => db.raw(`SELECT setVal('jto_users_id_seq', ?)`, [users[users.length - 1].id]));
 }
 
@@ -352,6 +375,7 @@ module.exports = {
   makeCardsArray,
   makeExpectedCard,
   makeExpectedPrivateCard,
+  makeExpectedComments,
   makeExpectedReactions,
   makeCommentsArray,
   makeReactsArray,

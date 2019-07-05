@@ -3,6 +3,7 @@ const path = require("path");
 const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
 const CommentsService = require('../services/comments-service')
+const { requireAuth } = require('../middleware/jwt-auth')
 
 const commentsRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -12,9 +13,9 @@ const jsonBodyParser = express.json();
 commentsRouter
     .route("/")
     .post(requireAuth, jsonBodyParser, (req, res, next) => {
-        const { body, card_id, user_id } = req.body
+        const { body, card_id } = req.body
 
-        const newComment = { body, card_id, user_id };
+        const newComment = { body, card_id };
 
         for (const [key, value] of Object.entries(newComment)) {
             if (value == null) {
@@ -28,7 +29,11 @@ commentsRouter
             CommentsService
                 .insertComment(req.app.get("db"), newComment)
                 .then(comment => {
-                    res.status(201).location(path.posix.join(req.originalUrl, `/${comment.id}`))
+                    res
+                        .status(201)
+                        .location(path.posix.join(req.originalUrl, `/${comment.id}`))
+                        .json(CommentsService.serializeComment(comment))
+
                 })
                 .catch(next)
         }
@@ -40,6 +45,7 @@ commentsRouter
 
 commentsRouter
     .route("/:comment_id")
+    .all(requireAuth)
     .all(checkCommentExists)
     .get((req, res) => {
         // to do: add require auth

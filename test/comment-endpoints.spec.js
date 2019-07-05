@@ -33,23 +33,23 @@ describe('Comment endpoints', () => {
     // })
 
     context(`Authorized user posts a new comment`, () => {
-      beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testUsers, testCards, testComments, testReacts));
+      beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Creates a new comment, responding with 201 and the new review", function () {
         // this.retries(2)
         const testCard = testCards[0];
-        const testUser = testUsers[1];
+        const testUser = testUsers[0];
         const newComment = {
           body: "Testing new comment",
-          card_id: testCard.id,
-          user_id: testUser.id
+          card_id: testCard.id
         }
-
+        console.log(helpers.makeAuthHeader(testUsers[0]))
         return supertest(app)
           .post(`/api/comments`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
           .send(newComment)
           .expect(201)
           .expect((res) => {
-            console.log(res.body)
+            expect(res.body).to.have.property('id')
           })
       });
     })
