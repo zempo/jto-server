@@ -76,7 +76,7 @@ describe("Auth Endpoints", function () {
                     algorithm: "HS256"
                 }
             );
-            console.log(expectedToken)
+            // console.log(expectedToken)
             return supertest(app)
                 .post("/api/auth/login")
                 .send(userValidCreds)

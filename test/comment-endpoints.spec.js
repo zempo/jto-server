@@ -45,10 +45,11 @@ describe('Comment endpoints', () => {
         console.log(helpers.makeAuthHeader(testUsers[0]))
         return supertest(app)
           .post(`/api/comments`)
-          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(newComment)
           .expect(201)
           .expect((res) => {
+            console.log(res.body)
             expect(res.body).to.have.property('id')
           })
       });

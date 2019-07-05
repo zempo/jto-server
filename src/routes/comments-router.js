@@ -23,20 +23,19 @@ commentsRouter
                     error: `Missing '${key}' in request body`
                 });
             }
-
-            newComment.user_id = req.user.id
-
-            CommentsService
-                .insertComment(req.app.get("db"), newComment)
-                .then(comment => {
-                    res
-                        .status(201)
-                        .location(path.posix.join(req.originalUrl, `/${comment.id}`))
-                        .json(CommentsService.serializeComment(comment))
-
-                })
-                .catch(next)
         }
+
+        newComment.user_id = req.user.id
+
+        CommentsService.insertComment(req.app.get("db"), newComment)
+            .then(comment => {
+                console.log(comment)
+                res
+                    .status(201)
+                    .location(path.posix.join(req.originalUrl, `/${comment.id}`))
+                    .json(CommentsService.serializeComment(comment))
+            })
+            .catch(next)
     })
 
 // post new comment --> get comments 

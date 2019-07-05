@@ -36,9 +36,13 @@ const CommentsService = {
             .insert(newComment)
             .into('jto_comments')
             .returning('*')
-            .then(([comment]) => comment)
-            .then(comment => {
-                CommentsService.getById(db, comment.id)
+            .then(([comment]) => {
+                console.log(comment)
+                return comment
+            })
+            .then((comment) => {
+                console.log(comment["id"])
+                return CommentsService.getById(db, comment.id)
             })
     },
     deleteComment(db, id) {

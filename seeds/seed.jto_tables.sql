@@ -9,7 +9,7 @@ TRUNCATE
 
 INSERT INTO jto_users (user_name, full_name, email, password)
     VALUES
-    ('the_card_czar', 'Sandra Connor', 'sandraconnors@yahoo.com', '$2a$12$MV7OUsNaGakwgJuK.xLOw.SNU3x8p8L41/2QHVGtKNTkmiDVqMuZy'),
+    ('the_card_czar', 'Sandra Connor', 'sandraconnors@yahoo.com', '$2a$10$i57JnoTkJYAT3uFoPtSOze2FJziY6ldRtDHwTrnoDPpbYSMpxhRqq'),
     ('greet-expectations', 'Mike Man', 'jenglish@uk.gov', '$2a$12$5IVP3nR2zVB4gxheaXpXx.JhyFkdTBntGff/KerqCnmFYwJ8G6PjS'),
     ('mindy-city', 'Mindy Momo', 'mmomo@gmail.com', '$2a$12$HUASIHyDako.13cXrl7oVOLK6AIw72wDfuC6svvCzA/u4m2xXuT9y');
 
