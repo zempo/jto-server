@@ -10,8 +10,8 @@ TRUNCATE
 INSERT INTO jto_users (user_name, full_name, email, password)
     VALUES
     ('the_card_czar', 'Sandra Connor', 'sandraconnors@yahoo.com', '$2a$10$i57JnoTkJYAT3uFoPtSOze2FJziY6ldRtDHwTrnoDPpbYSMpxhRqq'),
-    ('greet-expectations', 'Mike Man', 'jenglish@uk.gov', '$2a$12$5IVP3nR2zVB4gxheaXpXx.JhyFkdTBntGff/KerqCnmFYwJ8G6PjS'),
-    ('mindy-city', 'Mindy Momo', 'mmomo@gmail.com', '$2a$12$HUASIHyDako.13cXrl7oVOLK6AIw72wDfuC6svvCzA/u4m2xXuT9y');
+    ('greet-expectations', 'Mike Man', 'jenglish@uk.gov', '$2a$10$HlKayYzBDUqodJDIzzJIgOcxGlgoGKG2tdqiRcfRbONRscR6cLbNq'),
+    ('mindy-city', 'Mindy Momo', 'mmomo@gmail.com', '$2a$10$xK7keBV2VfSBU9P4W9ENYu5DX96Zn4ONnTuihzeXDmY552gmk5FuC');
 
 INSERT INTO jto_cards 
     (theme, front_message, front_image, inside_message, inside_image, user_id, public)
@@ -20,7 +20,8 @@ INSERT INTO jto_cards
     ('indie', 'Happy Fathers Day!', '', 'To an amazing dad!', 'https://loremflickr.com/g/320/240/dad', 2, TRUE),
     ('pen', 'Maybe it''s May...', 'https://loremflickr.com/g/400/500/spring', 'I wouldn''t know, though. Here''s to hoping that I guess your birthday correctly!', 'https://loremflickr.com/g/320/240/cake', 1, TRUE),
     ('roboto', 'Celebrate Good Times, Come on!', 'https://loremflickr.com/g/320/240/happy', 'Celebrate good times! buddy, come on! Dadadada, da da da da da-da!', '', 3, TRUE),
-    ('cursive-plus', 'You Are Cordially Invited to the Wedding of Mike and Ike', 'https://loremflickr.com/g/500/400/wedding', 'It will be at Hampden South and Oak lane. If you reach the magestic waterfall, you''ve gone too far. Food will be provided! For the Grooms, that is!', 'https://loremflickr.com/g/320/240/ring', 2, default);
+    ('cursive-plus', 'You Are Cordially Invited to the Wedding of Mike and Ike', 'https://loremflickr.com/g/500/400/wedding', 'It will be at Hampden South and Oak lane. If you reach the magestic waterfall, you''ve gone too far. Food will be provided! For the Grooms, that is!', 'https://loremflickr.com/g/320/240/ring', 2, default),
+    ('kiddo', 'I don''t abhor arbor day! And neither should you!', 'https://loremflickr.com/g/500/400/trees', 'Tree-t others the way you want to be treated!', 'https://loremflickr.com/g/320/240/tree', 1, default);
 
 INSERT INTO jto_comments
     (body, card_id, user_id)

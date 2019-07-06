@@ -14,7 +14,14 @@ privateRouter
   .all(requireAuth)
   .all(checkForPrivateCards)
   .get((req, res) => {
-    res.json(PrivateService.serializeCards(res.cards));
+    // console.log(req.user)
+    // console.log(res.cards[0]['user:id'])
+    // or if admin boolean, eventually? 
+    if (req.user.id === res.cards[0]['user:id']) {
+      res.json(PrivateService.serializeCards(res.cards));
+    } else {
+      res.status(403).end()
+    }
   });
 
 // Auth required
@@ -28,7 +35,12 @@ privateRouter
   .all(requireAuth)
   .all(checkCardStillPrivate)
   .get((req, res) => {
-    res.json(PrivateService.serializeCards(res.card))
+    if (req.user.id === res.card[0]['user:id']) {
+      // res.json(PrivateService.serializeCards(res.cards));
+      res.json(PrivateService.serializeCards(res.card))
+    } else {
+      res.status(403).end()
+    }
     // res.send(res.card)
   })
 
@@ -46,7 +58,7 @@ async function checkCardStillPrivate(req, res, next) {
   try {
     // const cards = await PrivateService.getPrivateCards()
     const card = await PrivateService.getPrivateById(req.app.get("db"), req.params.user_id, req.params.card_id);
-    // console.log(card)
+    // console.log(req.user)
     if (card.length === 0)
       return res.status(404).json({
         error: `This card is no longer private. It might have been deleted or made public.`

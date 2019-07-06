@@ -48,15 +48,25 @@ commentsRouter
     .all(requireAuth)
     .all(checkCommentExists)
     .get((req, res) => {
-        res.json(CommentsService.serializeComment(res.comment))
+        // console.log(res.comment.user.id)
+        if (req.user.id === res.comment.user.id) {
+            res.json(CommentsService.serializeComment(res.comment))
+        } else {
+            res.status(403).end()
+        }
     })
     .delete((req, res, next) => {
 
-        CommentsService.deleteComment(req.app.get("db"), req.params.comment_id)
-            .then((numberRowsAffected) => {
-                res.status(204).end()
-            })
-            .catch(next)
+        if (req.user.id === res.comment.user.id) {
+            // res.json(CommentsService.serializeComment(res.comment))
+            CommentsService.deleteComment(req.app.get("db"), req.params.comment_id)
+                .then((numberRowsAffected) => {
+                    res.status(204).end()
+                })
+                .catch(next)
+        } else {
+            res.status(403).end()
+        }
     })
     .patch(jsonBodyParser, (req, res, next) => {
         const { body, date_created } = req.body
@@ -69,10 +79,12 @@ commentsRouter
             })
         }
 
-        CommentsService.updateComment(req.app.get("db"), req.params.comment_id, commentToUpdate)
-            .then(numberRowsAffected => {
-                res.status(204).end()
-            })
+        if (req.user.id === res.comment.user.id) {
+            CommentsService.updateComment(req.app.get("db"), req.params.comment_id, commentToUpdate)
+                .then(numberRowsAffected => {
+                    res.status(204).end()
+                })
+        }
     })
 
 async function checkCommentExists(req, res, next) {
