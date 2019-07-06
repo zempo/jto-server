@@ -41,10 +41,10 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
         })
 })
 
-authRouter.post("/refresh", requireAuth, (req, res) => {
+authRouter.post("/refresh", requireAuth, (req, res, next) => {
     const sub = req.user.user_name
     const payload = { user_id: user.id }
-
+    console.log(sub)
     res.send({
         authToken: AuthService.createJwt(sub, payload)
     }).end()

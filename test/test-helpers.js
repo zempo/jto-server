@@ -365,9 +365,9 @@ function seedCardsTables(db, users, cards, comments = [], reacts = []) {
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.user_name,
-    expiresIn: process.env.JWT_EXPIRY,
     algorithm: "HS256"
   });
+  // console.log(token)
   return `Bearer ${token}`;
 }
 

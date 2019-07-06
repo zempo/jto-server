@@ -4,12 +4,14 @@ const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
 
 // setup
+const { requireAuth } = require('../middleware/jwt-auth')
 const privateRouter = express.Router();
 const PrivateService = require("../services/private-service");
 
 // auth required for user's cards
 privateRouter
   .route("/cards/:user_id")
+  .all(requireAuth)
   .all(checkForPrivateCards)
   .get((req, res) => {
     res.json(PrivateService.serializeCards(res.cards));
@@ -23,6 +25,7 @@ privateRouter
 
 privateRouter
   .route("/cards/:user_id/:card_id")
+  .all(requireAuth)
   .all(checkCardStillPrivate)
   .get((req, res) => {
     res.json(PrivateService.serializeCards(res.card))

@@ -47,13 +47,9 @@ commentsRouter
     .all(requireAuth)
     .all(checkCommentExists)
     .get((req, res) => {
-        // to do: add require auth
-        // use get req to populate form
         res.json(CommentsService.serializeComment(res.comment))
     })
     .delete((req, res, next) => {
-        // make sure to add requireAuth
-        // .delete(requireAuth, (req, res, next) => {...})
 
         CommentsService.deleteComment(req.app.get("db"), req.params.comment_id)
             .then((numberRowsAffected) => {

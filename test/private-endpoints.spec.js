@@ -67,6 +67,7 @@ describe("Endpoints for a user's private cards", function () {
         // console.log(expectedCards);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .expect(200, expectedCards);
       });
     });
@@ -94,6 +95,7 @@ describe("Endpoints for a user's private cards", function () {
         // console.log(expectedCard);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}/${cardToQuery}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .expect(404, { error: `This card is no longer private. It might have been deleted or made public.` });
       })
     })
@@ -118,6 +120,7 @@ describe("Endpoints for a user's private cards", function () {
         // console.log(expectedCard);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}/${cardToQuery}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .expect(200, expectedCard);
       })
     })
