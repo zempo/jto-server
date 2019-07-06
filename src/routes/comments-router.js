@@ -42,6 +42,7 @@ commentsRouter
 // get comments --> delete comment --> get comments
 // get comments --> click comment edit --> get comment --> populate form values --> patch comment --> get comments 
 
+// add a user to comment verification middleware 
 commentsRouter
     .route("/:comment_id")
     .all(requireAuth)

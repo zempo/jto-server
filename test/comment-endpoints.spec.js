@@ -53,35 +53,70 @@ describe('Comment endpoints', () => {
     })
   });
 
-  describe(`GET for api/comments/comment_id`, () => {
-    // beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testUsers, testCards, testComments, testReacts));
-
+  describe(`GET api/comments/comment_id`, () => {
     after("spacing", () => console.log('-------------------------------------\n'))
-    it("GET / responds with 200", () => {
+    beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+    context('Given a comment does not exist', () => {
+      const commentToGet = 20100400010012
       return supertest(app)
-        .get("/")
-        .expect(200);
-    });
+        .get(`/api/comments/${commentToGet}`)
+        .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+        .expect(404);
+    })
+
+    context('Given a comment exists', () => {
+      it("GET / responds with 200", () => {
+        const commentToGet = 2
+        const expectedComment = testComments.map(comment => { helpers.makeExpectedComments(testUsers, commentToGet, testComments) })
+        return supertest(app)
+          .get(`/api/comments/${commentToGet}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(200, expectedComment);
+      });
+    })
+
   })
 
-  describe(`PATCH for api/comments/comment_id`, () => {
-    // beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testUsers, testCards, testComments, testReacts));
+  describe(`PATCH api/comments/comment_id`, () => {
+    beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
     after("spacing", () => console.log('-------------------------------------\n'))
-    it("GET / responds with 200", () => {
+
+    context('Given a comment does not exist', () => {
+      const commentToGet = 20100400010012
       return supertest(app)
-        .get("/")
-        .expect(200);
-    });
+        .patch(`/api/comments/${commentToGet}`)
+        .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+        .expect(404);
+    })
+
+    context('Given an incomplete patch', () => {
+
+    })
+
+    context('Given a malicious patch', () => {
+
+    })
+
+    context('Given a complete patch', () => {
+
+    })
   })
 
   describe(`DELETE for api/comments/comment_id`, () => {
-    // beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testUsers, testCards, testComments, testReacts));
-    it("GET / responds with 200", () => {
-      return supertest(app)
-        .get("/")
-        .expect(200);
-    });
+    beforeEach("insert things", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+    after("spacing", () => console.log('-------------------------------------\n'))
+
+    context('Given the article exists', () => {
+      console.log(testComments)
+      const commentToDelete = 2
+      it("Responds with 204 and deletes given content", () => {
+        return supertest(app)
+          .delete(`/api/comments/${commentToDelete}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[2]))
+          .expect(204);
+      });
+    })
   })
 
 

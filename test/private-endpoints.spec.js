@@ -44,6 +44,7 @@ describe("Endpoints for a user's private cards", function () {
         // console.log(expectedCards);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
           .expect(200, []);
       });
     });
@@ -67,7 +68,7 @@ describe("Endpoints for a user's private cards", function () {
         // console.log(expectedCards);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
-          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
           .expect(200, expectedCards);
       });
     });
@@ -107,14 +108,13 @@ describe("Endpoints for a user's private cards", function () {
         let userToQuery = 1
         let cardToQuery = 3
         const expectedCard = testCards.filter((card, i, cards) => {
-          // console.log(userToQuery)
           if (card["public"] == false && card["user_id"] == userToQuery && card["id"] == cardToQuery) {
             return true
           } else {
             return false
           }
         }).map(card => {
-          // console.log(helpers.makeExpectedPrivateCard(testUsers, card));
+          testUsers.forEach(user => user.password);
           return helpers.makeExpectedPrivateCard(testUsers, card);
         });
         // console.log(expectedCard);
@@ -125,5 +125,4 @@ describe("Endpoints for a user's private cards", function () {
       })
     })
   })
-
 });
