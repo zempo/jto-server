@@ -4,8 +4,9 @@ const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
 
 // setup
-const { requireAuth } = require('../middleware/jwt-auth')
+const { requireAuth } = require("../middleware/jwt-auth");
 const privateRouter = express.Router();
+const jsonBodyParser = express.json();
 const PrivateService = require("../services/private-service");
 
 // auth required for user's cards
@@ -16,41 +17,132 @@ privateRouter
   .get((req, res) => {
     // console.log(req.user)
     // console.log(res.cards[0]['user:id'])
-    // or if admin boolean, eventually? 
-    if (req.user.id === res.cards[0]['user:id']) {
+    // or if admin boolean, eventually?
+    if (req.user.id === res.cards[0]["user:id"]) {
       res.json(PrivateService.serializeCards(res.cards));
     } else {
-      res.status(403).end()
+      res.status(403).end();
     }
+  })
+  .post(jsonBodyParser, (req, res, next) => {
+    const { theme, front_message, front_image, inside_message, inside_image } = req.body;
+
+    const newCard = { theme, front_message, front_image, inside_message, inside_image };
+    // use req.user.id to access this endpoint
+    for (const [key, value] of Object.entries(newCard)) {
+      if (value == null && (key !== front_image || key !== inside_image)) {
+        console.log(front_image.length);
+        return res.status(400).json({
+          error: `Missing '${key}' in request body.`
+        });
+      } else if (front_message.length > 100 || inside_message.length > 650) {
+        return res.status(400).json({
+          error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+        });
+      } else if (!isWebUri(front_image) || !isWebUri(inside_image)) {
+        return res.status(400).send(`Card images must be valid URL`);
+      }
+    }
+
+    newCard.user_id = req.user.id;
+
+    PrivateService.insertCard(req.app.get("db"), newCard)
+      .then((card) => {
+        // console.log(card[0]["id"]);
+        return res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${card[0]["id"]}`))
+          .json(PrivateService.serializeCard(card[0]));
+      })
+      .catch(next);
   });
 
 // Auth required
-// post new private card --> get private cards 
+// post new private card --> get private cards
 // get private cards --> delete private card --> get private cards
-// get private cards --> click private card edit --> get private card --> populate form values --> patch private card --> get private cards 
-// get private cards --> click make private --> recieve notificaton --> patch private card public to false --> get private cards, private card should be missing 
+// get private cards --> click private card edit --> get private card --> populate form values --> patch private card --> get private cards
+// get private cards --> click make private --> recieve notificaton --> patch private card public to false --> get private cards, private card should be missing
 
 privateRouter
   .route("/cards/:user_id/:card_id")
   .all(requireAuth)
   .all(checkCardStillPrivate)
   .get((req, res) => {
-    if (req.user.id === res.card[0]['user:id']) {
+    if (req.user.id === res.card[0]["user:id"]) {
       // res.json(PrivateService.serializeCards(res.cards));
-      res.json(PrivateService.serializeCards(res.card))
+      res.json(PrivateService.serializeCards(res.card));
     } else {
-      res.status(403).end()
+      res.status(403).end();
     }
     // res.send(res.card)
   })
+  .delete((req, res, next) => {
+    if (req.user.id === res.card[0]["user:id"]) {
+      // res.json(CommentsService.serializeComment(res.comment))
+      PrivateService.deleteCard(req.app.get("db"), req.params.card_id)
+        .then((numberRowsAffected) => {
+          res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      res.status(403).end();
+    }
+  })
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { theme, front_message, front_image, inside_message, inside_image } = req.body;
+
+    const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
+
+    const numberOfValues = Object.values(cardToUpdate).filter(Boolean).length;
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image`
+      });
+    } else if ((front_message && front_message.length > 100) || (inside_image && inside_message > 650)) {
+      return res.status(400).json({
+        error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+      });
+    } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
+      return res.status(400).json({ error: `Card images must be valid URL` });
+    }
+
+    if (req.user.id === res.card[0]["user:id"]) {
+      PrivateService.updateCard(req.app.get("db"), req.params.card_id, cardToUpdate)
+        .then((numberRowsAffected) => {
+          return res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      res.status(403).end();
+    }
+  });
+
+privateRouter
+  .route("/make-public/:user_id/:card_id")
+  .all(requireAuth)
+  .all(checkCardStillPrivate)
+  .patch(jsonBodyParser, (req, res, next) => {
+    // toggle a card's privacy
+    const cardToUpdate = { public: "true" };
+
+    if (req.user.id === res.card[0]["user:id"]) {
+      PrivateService.updateCard(req.app.get("db"), req.params.card_id, cardToUpdate)
+        .then((numberRowsAffected) => {
+          return res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      res.status(403).end();
+    }
+  });
 
 async function checkForPrivateCards(req, res, next) {
   try {
-    const cards = await PrivateService.getPrivateCards(req.app.get("db"), req.params.user_id)
-    res.cards = cards
-    next()
+    const cards = await PrivateService.getPrivateCards(req.app.get("db"), req.params.user_id);
+    res.cards = cards;
+    next();
   } catch (error) {
-    next(error)
+    next(error);
   }
 }
 

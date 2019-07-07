@@ -4,32 +4,52 @@ const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
 
 // setup
+const { requireAuth } = require("../middleware/jwt-auth");
 const cardRouter = express.Router();
+const jsonBodyParser = express.json();
 const CardsService = require("../services/card-service");
+const PrivateService = require("../services/private-service");
 
 // No auth required
-cardRouter
-  .route("/")
-  .get((req, res, next) => {
-    CardsService.getPublicCards(req.app.get("db"))
-      .then((cards) => {
-        res.json(CardsService.serializeCards(cards));
-      })
-      .catch(next);
-  })
-  .post((req, res) => { });
+cardRouter.route("/").get((req, res, next) => {
+  CardsService.getPublicCards(req.app.get("db"))
+    .then((cards) => {
+      res.json(CardsService.serializeCards(cards));
+    })
+    .catch(next);
+});
 
 // Auth required
-// post new card --> get cards 
+// post new card --> get cards
 // get cards --> delete card --> get cards
-// get cards --> click card edit --> get card --> populate form values --> patch card --> get cards 
-// get cards --> click make private --> recieve notificaton --> patch card public to false --> get cards, card should be missing 
+// get cards --> click card edit --> get card --> populate form values --> patch card --> get cards
+// get cards --> click make private --> recieve notificaton --> patch card public to false --> get cards, card should be missing
 
 cardRouter
   .route("/:card_id")
   .all(checkCardExists)
   .get((req, res) => {
-    res.json(CardsService.serializeCard(res.card))
+    res.json(CardsService.serializeCard(res.card));
+  });
+
+cardRouter
+  .route("/make-private/:card_id")
+  .all(requireAuth)
+  .all(checkCardExists)
+  .patch(jsonBodyParser, (req, res, next) => {
+    // toggle a card's privacy
+    const cardToUpdate = { public: "false" };
+    console.log(res.card["user:id"]);
+
+    if (req.user.id === res.card["user:id"]) {
+      PrivateService.updateCard(req.app.get("db"), req.params.card_id, cardToUpdate)
+        .then((numberRowsAffected) => {
+          return res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      res.status(403).end();
+    }
   });
 
 /* async/await syntax for promises */

@@ -16,7 +16,7 @@ const PrivateService = {
         "card.inside_image",
         "card.date_created",
         "card.public",
-        ...userFields,
+        ...userFields
       )
       .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where({
@@ -37,7 +37,7 @@ const PrivateService = {
         "card.inside_image",
         "card.date_created",
         "card.public",
-        ...userFields,
+        ...userFields
       )
       .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
       .where({
@@ -47,8 +47,29 @@ const PrivateService = {
       })
       .groupBy("card.id", "usr.id");
   },
-  privateToPublic(db, user_id, card_id) {
-    console.log('hello');
+  insertCard(db, newCard) {
+    return db
+      .insert(newCard)
+      .into("jto_cards")
+      .returning("*")
+      .then(([card]) => {
+        // console.log(card);
+        return card;
+      })
+      .then((card) => {
+        // console.log(card);
+        return PrivateService.getPrivateById(db, card.user_id, card.id);
+      });
+  },
+  deleteCard(db, id) {
+    return db("jto_cards")
+      .where({ id })
+      .delete();
+  },
+  updateCard(db, id, newCardFields) {
+    return db("jto_cards")
+      .where({ id })
+      .update(newCardFields);
   },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
@@ -77,7 +98,6 @@ const userFields = [
   "usr.user_name AS user:user_name",
   "usr.full_name AS user:full_name",
   "usr.email AS user:email",
-  "usr.password AS user:password",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
 ];
