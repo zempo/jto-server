@@ -28,20 +28,10 @@ privateRouter
     const { theme, front_message, front_image, inside_message, inside_image } = req.body;
 
     const newCard = { theme, front_message, front_image, inside_message, inside_image };
-    // use req.user.id to access this endpoint
-    for (const [key, value] of Object.entries(newCard)) {
-      if (value == null && (key !== front_image || key !== inside_image)) {
-        console.log(front_image.length);
-        return res.status(400).json({
-          error: `Missing '${key}' in request body.`
-        });
-      } else if (front_message.length > 100 || inside_message.length > 650) {
-        return res.status(400).json({
-          error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
-        });
-      } else if (!isWebUri(front_image) || !isWebUri(inside_image)) {
-        return res.status(400).send(`Card images must be valid URL`);
-      }
+
+    const error = PrivateService.postValidator(newCard);
+    if (error) {
+      return res.status(400).json(error);
     }
 
     newCard.user_id = req.user.id;
@@ -93,17 +83,9 @@ privateRouter
 
     const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
 
-    const numberOfValues = Object.values(cardToUpdate).filter(Boolean).length;
-    if (numberOfValues === 0) {
-      return res.status(400).json({
-        error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image`
-      });
-    } else if ((front_message && front_message.length > 100) || (inside_image && inside_message > 650)) {
-      return res.status(400).json({
-        error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
-      });
-    } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
-      return res.status(400).json({ error: `Card images must be valid URL` });
+    const error = PrivateService.patchValidator(cardToUpdate);
+    if (error) {
+      return res.status(400).json(error);
     }
 
     if (req.user.id === res.card[0]["user:id"]) {

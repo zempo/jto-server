@@ -54,7 +54,7 @@ const CommentsService = {
   serializeComment(comment) {
     return {
       id: comment.id,
-      body: comment.body,
+      body: xss(comment.body),
       card_id: comment.card_id,
       date_created: comment.date_created,
       user: comment.user || {}

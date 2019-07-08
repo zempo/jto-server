@@ -1,5 +1,6 @@
 const xss = require("xss");
 const Treeize = require("treeize");
+const { isWebUri } = require("valid-url");
 
 const PrivateService = {
   getPrivateCards(db, user_id) {
@@ -70,6 +71,58 @@ const PrivateService = {
     return db("jto_cards")
       .where({ id })
       .update(newCardFields);
+  },
+  postValidator({ theme, front_message, front_image, inside_message, inside_image }) {
+    const NO_ERRORS = null;
+    const themeRegex = /^\S*\b(cursive|cursive-plus|handwritten-bold|handwritten|indie|kiddo|pen|quill|roboto|sharpie|typed)\b/;
+    const spaceRegex = /^\S*$/;
+
+    for (const [key, value] of Object.entries({ theme, front_message, front_image, inside_message, inside_image })) {
+      if (value == null && (key === theme || key === front_message || key === inside_message)) {
+        return {
+          error: `Missing '${key}' in request body. Images are not required.`
+        };
+      } else if (theme && (themeRegex.test(theme) == false || spaceRegex.test(theme) == false)) {
+        // console.log(themeRegex.test(theme) == false);
+        return {
+          error: `Invalid theme supplied.`
+        };
+      } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
+        return {
+          error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+        };
+      } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
+        return { error: `Card images must be valid URL` };
+      }
+    }
+
+    return NO_ERRORS;
+  },
+  patchValidator({ theme, front_message, front_image, inside_message, inside_image }) {
+    const NO_ERRORS = null;
+    const themeRegex = /^\S*\b(cursive|cursive-plus|handwritten-bold|handwritten|indie|kiddo|pen|quill|roboto|sharpie|typed)\b/;
+    const spaceRegex = /^\S*$/;
+    const numberOfValues = Object.values({ theme, front_message, front_image, inside_message, inside_image }).filter(
+      Boolean
+    ).length;
+    if (numberOfValues === 0) {
+      return {
+        error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image`
+      };
+    } else if (theme && (themeRegex.test(theme) == false || spaceRegex.test(theme) == false)) {
+      // console.log(themeRegex.test(theme) == false);
+      return {
+        error: `Invalid theme supplied.`
+      };
+    } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
+      return {
+        error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+      };
+    } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
+      return { error: `Card images must be valid URL` };
+    }
+
+    return NO_ERRORS;
   },
   serializeCards(cards) {
     return cards.map(this.serializeCard);
