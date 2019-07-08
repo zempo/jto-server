@@ -15,8 +15,6 @@ const CommentsService = {
                         SELECT
                         usr.id,
                         usr.user_name,
-                        usr.full_name,
-                        usr.email,
                         usr.date_created,
                         usr.date_modified
                     ) tmp)

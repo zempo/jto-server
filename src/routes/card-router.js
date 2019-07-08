@@ -1,7 +1,4 @@
 const express = require("express");
-const path = require("path");
-const uuid = require("uuid/v4");
-const { isWebUri } = require("valid-url");
 
 // setup
 const { requireAuth } = require("../middleware/jwt-auth");
@@ -39,7 +36,6 @@ cardRouter
   .patch(jsonBodyParser, (req, res, next) => {
     // toggle a card's privacy
     const cardToUpdate = { public: "false" };
-    console.log(res.card["user:id"]);
 
     if (req.user.id === res.card["user:id"]) {
       PrivateService.updateCard(req.app.get("db"), req.params.card_id, cardToUpdate)
@@ -70,5 +66,3 @@ async function checkCardExists(req, res, next) {
 }
 
 module.exports = cardRouter;
-
-/////// PDF methods

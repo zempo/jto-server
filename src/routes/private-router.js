@@ -32,6 +32,10 @@ privateRouter
     const error = PrivateService.postValidator(newCard);
     if (error) {
       return res.status(400).json(error);
+    } else if (front_image && !isWebUri(front_image)) {
+      return res.status(400).json({ error: `Image url must be valid url.` });
+    } else if (inside_image && !isWebUri(inside_image)) {
+      return res.status(400).json({ error: `Image url must be valid url.` });
     }
 
     newCard.user_id = req.user.id;
@@ -59,16 +63,13 @@ privateRouter
   .all(checkCardStillPrivate)
   .get((req, res) => {
     if (req.user.id === res.card[0]["user:id"]) {
-      // res.json(PrivateService.serializeCards(res.cards));
       res.json(PrivateService.serializeCards(res.card));
     } else {
       res.status(403).end();
     }
-    // res.send(res.card)
   })
   .delete((req, res, next) => {
     if (req.user.id === res.card[0]["user:id"]) {
-      // res.json(CommentsService.serializeComment(res.comment))
       PrivateService.deleteCard(req.app.get("db"), req.params.card_id)
         .then((numberRowsAffected) => {
           res.status(204).end();
@@ -99,12 +100,12 @@ privateRouter
     }
   });
 
+// toggle a card's privacy
 privateRouter
   .route("/make-public/:user_id/:card_id")
   .all(requireAuth)
   .all(checkCardStillPrivate)
   .patch(jsonBodyParser, (req, res, next) => {
-    // toggle a card's privacy
     const cardToUpdate = { public: "true" };
 
     if (req.user.id === res.card[0]["user:id"]) {
@@ -130,9 +131,7 @@ async function checkForPrivateCards(req, res, next) {
 
 async function checkCardStillPrivate(req, res, next) {
   try {
-    // const cards = await PrivateService.getPrivateCards()
     const card = await PrivateService.getPrivateById(req.app.get("db"), req.params.user_id, req.params.card_id);
-    // console.log(req.user)
     if (card.length === 0)
       return res.status(404).json({
         error: `This card is no longer private. It might have been deleted or made public.`

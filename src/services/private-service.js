@@ -78,6 +78,7 @@ const PrivateService = {
     const spaceRegex = /^\S*$/;
 
     for (const [key, value] of Object.entries({ theme, front_message, front_image, inside_message, inside_image })) {
+      // console.log((!isWebUri(front_image) || !isWebUri(inside_image)) && (key === front_image || key === inside_image));
       if (value == null && (key === theme || key === front_message || key === inside_message)) {
         return {
           error: `Missing '${key}' in request body. Images are not required.`
@@ -91,8 +92,6 @@ const PrivateService = {
         return {
           error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
         };
-      } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
-        return { error: `Card images must be valid URL` };
       }
     }
 
@@ -149,8 +148,6 @@ const PrivateService = {
 const userFields = [
   "usr.id AS user:id",
   "usr.user_name AS user:user_name",
-  "usr.full_name AS user:full_name",
-  "usr.email AS user:email",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
 ];
