@@ -29,23 +29,16 @@ const ReactionsService = {
       .first();
   },
   matchReaction(db, card_id, user_id) {
-    return db("jto_reacts AS reacts")
-      .where({
-        "reacts.card_id": card_id,
-        "reacts.user_id": user_id
-      })
-      .then(([reaction]) => {
-        console.log(reaction);
-        return reaction;
-      })
-      .then((reaction) => {
-        return reaction;
-      });
+    return db
+      .from('jto_reacts AS reacts')
+      .select("reacts.react_heart AS hearts", "reacts.react_share AS shares", "reacts.card_id", "reacts.user_id")
+      .where({ "reacts.card_id": card_id, "reacts.user_id": user_id });
   },
   insertReaction(db, newReaction) {
     return db
       .insert(newReaction)
       .into("jto_reacts")
+      .returning("*")
       .then(([reaction]) => {
         console.log(reaction);
         return reaction;
@@ -61,9 +54,9 @@ const ReactionsService = {
       .update(newReaction);
   },
   serializeReactions(cards) {
-    return cards.map(this.serializeReaction);
+    return cards.map(this.serializeReactionCount);
   },
-  serializeReaction(card) {
+  serializeReactionCount(card) {
     const cardTree = new Treeize();
 
     const cardData = cardTree.grow([card]).getData()[0];
@@ -80,6 +73,18 @@ const ReactionsService = {
       public: cardData.public,
       number_of_hearts: Number(cardData.number_of_hearts) || 0,
       number_of_shares: Number(cardData.number_of_shares) || 0
+    };
+  },
+  serializeQueriedReaction(reaction) {
+    const cardTree = new Treeize();
+
+    const reactionData = cardTree.grow([reaction]).getData()[0];
+
+    return {
+      card_id: reactionData.card_id,
+      user_id: reactionData.user_id,
+      hearts: reactionData.hearts,
+      shares: reactionData.shares
     };
   }
 };

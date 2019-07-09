@@ -18,7 +18,7 @@ reactionsRouter
       })
       .catch(next);
   })
-  .post((req, res) => {});
+  .post((req, res) => { });
 
 // Auth required
 // posting a reaction to a particular card with a particular id
@@ -26,7 +26,7 @@ reactionsRouter
   .route("/:card_id")
   .all(checkCardExists)
   .get((req, res) => {
-    res.json(ReactionsService.serializeReaction(res.card));
+    res.json(ReactionsService.serializeReactionCount(res.card));
   });
 
 reactionsRouter
@@ -35,22 +35,35 @@ reactionsRouter
   .all(checkCardExists)
   .all(checkUserReacted)
   .get((req, res, next) => {
-    console.log("hello");
+
+    res.send(res.reaction).end()
+    // ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, res.user.id)
+    //   .then(reaction => {
+    //     if (!reaction) {
+    //       return res.status(404).end()
+    //     }
+    //     return res.json(ReactionsService.serializeQueriedReaction(reaction))
+    //   })
+    //   .catch(next)
   })
-  .patch((req, res, next) => {});
+  .patch((req, res, next) => { });
 
 reactionsRouter
   .route("/shares/:card_id")
   .all(requireAuth)
   .all(checkCardExists)
-  .all(checkUserReacted)
-  .patch((req, res, next) => {});
+  .patch((req, res, next) => { });
 
 async function checkUserReacted(req, res, next) {
   try {
-    const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, res.user.id);
+    const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
-    console.log(reaction);
+    if (!reaction) {
+      // no reaction, new one should be created
+      res.reaction = false
+    }
+    res.reaction = reaction
+    next()
   } catch (error) {
     next(error);
   }

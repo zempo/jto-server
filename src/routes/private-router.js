@@ -122,6 +122,7 @@ privateRouter
 async function checkForPrivateCards(req, res, next) {
   try {
     const cards = await PrivateService.getPrivateCards(req.app.get("db"), req.params.user_id);
+
     res.cards = cards;
     next();
   } catch (error) {
