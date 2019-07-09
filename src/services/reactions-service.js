@@ -28,6 +28,38 @@ const ReactionsService = {
       .where("card.id", id)
       .first();
   },
+  matchReaction(db, card_id, user_id) {
+    return db("jto_reacts AS reacts")
+      .where({
+        "reacts.card_id": card_id,
+        "reacts.user_id": user_id
+      })
+      .then(([reaction]) => {
+        console.log(reaction);
+        return reaction;
+      })
+      .then((reaction) => {
+        return reaction;
+      });
+  },
+  insertReaction(db, newReaction) {
+    return db
+      .insert(newReaction)
+      .into("jto_reacts")
+      .then(([reaction]) => {
+        console.log(reaction);
+        return reaction;
+      })
+      .then((reaction) => {
+        console.log(reaction);
+        return ReactionsService.getPublicReactions(db, reaction.card_id);
+      });
+  },
+  updateReactions(db, id, newReaction) {
+    return db("jto_reacts")
+      .where({ id })
+      .update(newReaction);
+  },
   serializeReactions(cards) {
     return cards.map(this.serializeReaction);
   },
