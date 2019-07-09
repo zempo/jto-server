@@ -30,8 +30,8 @@ const ReactionsService = {
   },
   matchReaction(db, card_id, user_id) {
     return db
-      .from('jto_reacts AS reacts')
-      .select("reacts.react_heart AS hearts", "reacts.react_share AS shares", "reacts.card_id", "reacts.user_id")
+      .from("jto_reacts AS reacts")
+      .select("*")
       .where({ "reacts.card_id": card_id, "reacts.user_id": user_id });
   },
   insertReaction(db, newReaction) {
@@ -40,18 +40,19 @@ const ReactionsService = {
       .into("jto_reacts")
       .returning("*")
       .then(([reaction]) => {
-        console.log(reaction);
+        // console.log(reaction);
         return reaction;
       })
       .then((reaction) => {
-        console.log(reaction);
-        return ReactionsService.getPublicReactions(db, reaction.card_id);
+        // console.log(reaction);
+        return ReactionsService.matchReaction(db, reaction.card_id, reaction.user_id);
       });
   },
-  updateReactions(db, id, newReaction) {
-    return db("jto_reacts")
+  updateReactions(db, id, newFields) {
+    return db
+      .from("jto_reacts")
       .where({ id })
-      .update(newReaction);
+      .update(newFields);
   },
   serializeReactions(cards) {
     return cards.map(this.serializeReactionCount);

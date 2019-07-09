@@ -1,24 +1,23 @@
 const express = require("express");
+const knex = require("knex");
 const path = require("path");
 const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
 
 // setup
+const jsonBodyParser = express.json();
 const { requireAuth } = require("../middleware/jwt-auth");
 const reactionsRouter = express.Router();
 const ReactionsService = require("../services/reactions-service");
 
 // No auth required
-reactionsRouter
-  .route("/")
-  .get((req, res, next) => {
-    ReactionsService.getPublicReactions(req.app.get("db"))
-      .then((cards) => {
-        res.json(ReactionsService.serializeReactions(cards));
-      })
-      .catch(next);
-  })
-  .post((req, res) => { });
+reactionsRouter.route("/").get((req, res, next) => {
+  ReactionsService.getPublicReactions(req.app.get("db"))
+    .then((cards) => {
+      res.json(ReactionsService.serializeReactions(cards));
+    })
+    .catch(next);
+});
 
 // Auth required
 // posting a reaction to a particular card with a particular id
@@ -32,27 +31,48 @@ reactionsRouter
 reactionsRouter
   .route("/hearts/:card_id")
   .all(requireAuth)
-  .all(checkCardExists)
   .all(checkUserReacted)
   .get((req, res, next) => {
-
-    res.send(res.reaction).end()
-    // ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, res.user.id)
-    //   .then(reaction => {
-    //     if (!reaction) {
-    //       return res.status(404).end()
-    //     }
-    //     return res.json(ReactionsService.serializeQueriedReaction(reaction))
-    //   })
-    //   .catch(next)
+    res.send(res.reaction).end();
   })
-  .patch((req, res, next) => { });
+  .patch(jsonBodyParser, (req, res, next) => {
+    // console.log(res.reaction[0].id);
+    let { id, hearts } = res.reaction[0];
+    // console.log(ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate));
+
+    const reactionToUpdate = { react_hearts: "true" };
+    ReactionsService.updateReactions(req.app.get("db"), id, reactionToUpdate)
+      .then((numberRowsAffected) => {
+        return res.status(204).end();
+      })
+      .catch(next);
+
+    // if (res.reaction.length !== 0) {
+    //   if (hearts === true) {
+    //     const reactionToUpdate = { react_hearts: "true" };
+    //     ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate)
+    //       .then((numberRowsAffected) => {
+    //         return res.status(204).end();
+    //       })
+    //       .catch(next);
+    //   } else {
+    //     const reactionToUpdate = { react_hearts: "true" };
+    //     ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate)
+    //       .then((numberRowsAffected) => {
+    //         return res.status(204).end();
+    //       })
+    //       .catch(next);
+    //   }
+    // } else {
+    //   res.send("add new").end();
+    // }
+  });
 
 reactionsRouter
   .route("/shares/:card_id")
   .all(requireAuth)
   .all(checkCardExists)
-  .patch((req, res, next) => { });
+  .post((req, res, next) => {});
 
 async function checkUserReacted(req, res, next) {
   try {
@@ -60,10 +80,10 @@ async function checkUserReacted(req, res, next) {
 
     if (!reaction) {
       // no reaction, new one should be created
-      res.reaction = false
+      return (res.reaction = false);
     }
-    res.reaction = reaction
-    next()
+    res.reaction = reaction;
+    next();
   } catch (error) {
     next(error);
   }
