@@ -19,8 +19,6 @@ reactionsRouter.route("/").get((req, res, next) => {
     .catch(next);
 });
 
-// Auth required
-// posting a reaction to a particular card with a particular id
 reactionsRouter
   .route("/:card_id")
   .all(checkCardExists)
@@ -31,22 +29,17 @@ reactionsRouter
 reactionsRouter
   .route("/hearts/:card_id")
   .all(requireAuth)
-  .all(checkUserReacted)
-  .get((req, res, next) => {
+  .get(checkUserReacted, (req, res, next) => {
     // if you get a card, do a post
     // if you don't, do a patch
+    // optimize on front-end
     res.send(res.reaction).end();
   })
-  .patch(jsonBodyParser, (req, res, next) => {
+  .patch(checkUserReacted, jsonBodyParser, (req, res, next) => {
+    // IF res.reaction, do PATCH
+    // IF NO res.reaction do POST
     const { id, react_heart } = res.reaction[0];
     console.log(react_heart);
-    // console.log(ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate));
-
-    // ReactionsService.updateReactions(req.app.get("db"), id, reactionToUpdate)
-    //   .then((numberRowsAffected) => {
-    //     return res.status(204).end();
-    //   })
-    //   .catch(next);
     if (react_heart === true) {
       const updatedReaction = { react_heart: "false" };
 
@@ -64,13 +57,66 @@ reactionsRouter
         })
         .catch(next);
     }
+  })
+  .post(jsonBodyParser, (req, res, next) => {
+    // IF res.reaction, do PATCH
+    // IF NO res.reaction do POST
+    // let { react_heart } = req.body;
+    let newReaction = { react_heart: "true" };
+    newReaction.user_id = req.user.id;
+    newReaction.card_id = Number(req.params.card_id);
+    // newReaction.react_heart = true;
+    console.log(newReaction);
+
+    // res.send(newReaction).end();
+    ReactionsService.insertReaction(req.app.get("db"), newReaction)
+      .then((reaction) => {
+        res
+          .status(201)
+          .json(reaction)
+          .end();
+      })
+      .catch(next);
   });
 
 reactionsRouter
   .route("/shares/:card_id")
   .all(requireAuth)
-  .all(checkCardExists)
-  .post((req, res, next) => {});
+  .all(checkUserReacted)
+  .get((req, res, next) => {
+    res.send(res.reaction).end();
+  })
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { id, react_share } = res.reaction[0];
+    console.log(react_share);
+    const updatedReaction = { react_share: "true" };
+
+    ReactionsService.updateReactions(req.app.get("db"), id, updatedReaction)
+      .then((numRowsAffected) => {
+        return res.status(204).end();
+      })
+      .catch(next);
+  })
+  .post(jsonBodyParser, (req, res, next) => {
+    // IF res.reaction, do PATCH
+    // IF NO res.reaction do POST
+    // let { react_heart } = req.body;
+    let newReaction = { react_share: "true" };
+    newReaction.user_id = req.user.id;
+    newReaction.card_id = Number(req.params.card_id);
+    // newReaction.react_heart = true;
+    console.log(newReaction);
+
+    // res.send(newReaction).end();
+    ReactionsService.insertReaction(req.app.get("db"), newReaction)
+      .then((reaction) => {
+        res
+          .status(201)
+          .json(reaction)
+          .end();
+      })
+      .catch(next);
+  });
 
 async function checkUserReacted(req, res, next) {
   try {
