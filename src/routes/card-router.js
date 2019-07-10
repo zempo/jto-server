@@ -30,6 +30,17 @@ cardRouter
   });
 
 cardRouter
+  .route("/comments/:card_id")
+  .all(checkCardExists)
+  .get((req, res, next) => {
+    CardsService.getCommentsByCard(req.app.get("db"), res.card["id"])
+      .then((comments) => {
+        res.json(comments);
+      })
+      .catch(next);
+  });
+
+cardRouter
   .route("/make-private/:card_id")
   .all(requireAuth)
   .all(checkCardExists)

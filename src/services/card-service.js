@@ -22,6 +22,12 @@ const CardsService = {
       .where("card.public", true)
       .groupBy("card.id", "usr.id");
   },
+  getCommentsByCard(db, id) {
+    return db
+      .from("jto_comments")
+      .select("*")
+      .where("jto_comments.card_id", id);
+  },
   getPublicById(db, id) {
     return CardsService.getPublicCards(db)
       .where("card.id", id)
@@ -55,6 +61,12 @@ const userFields = [
   "usr.user_name AS user:user_name",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
+];
+
+const commentFields = [
+  "comments.id AS comment:id",
+  "comments.body AS comment:body",
+  "comments.date_created AS comment:date_created"
 ];
 
 module.exports = CardsService;
