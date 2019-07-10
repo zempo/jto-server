@@ -7,6 +7,13 @@ const validator = require("email-validator");
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const UsersService = {
+  insertUser(db, newUser) {
+    return db
+      .insert(newUser)
+      .into("jto_users")
+      .returning("*")
+      .then(([user]) => user);
+  },
   uniqueUserName(db, user_name) {
     return db("jto_users")
       .where({ user_name })
