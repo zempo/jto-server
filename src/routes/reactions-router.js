@@ -1,8 +1,4 @@
 const express = require("express");
-const knex = require("knex");
-const path = require("path");
-const uuid = require("uuid/v4");
-const { isWebUri } = require("valid-url");
 
 // setup
 const jsonBodyParser = express.json();
@@ -39,7 +35,6 @@ reactionsRouter
     // IF res.reaction, do PATCH
     // IF NO res.reaction do POST
     const { id, react_heart } = res.reaction[0];
-    console.log(react_heart);
     if (react_heart === true) {
       const updatedReaction = { react_heart: "false" };
 
@@ -65,10 +60,7 @@ reactionsRouter
     let newReaction = { react_heart: "true" };
     newReaction.user_id = req.user.id;
     newReaction.card_id = Number(req.params.card_id);
-    // newReaction.react_heart = true;
-    console.log(newReaction);
 
-    // res.send(newReaction).end();
     ReactionsService.insertReaction(req.app.get("db"), newReaction)
       .then((reaction) => {
         res
@@ -88,7 +80,7 @@ reactionsRouter
   })
   .patch(jsonBodyParser, (req, res, next) => {
     const { id, react_share } = res.reaction[0];
-    console.log(react_share);
+
     const updatedReaction = { react_share: "true" };
 
     ReactionsService.updateReactions(req.app.get("db"), id, updatedReaction)
@@ -104,10 +96,7 @@ reactionsRouter
     let newReaction = { react_share: "true" };
     newReaction.user_id = req.user.id;
     newReaction.card_id = Number(req.params.card_id);
-    // newReaction.react_heart = true;
-    console.log(newReaction);
 
-    // res.send(newReaction).end();
     ReactionsService.insertReaction(req.app.get("db"), newReaction)
       .then((reaction) => {
         res
@@ -122,10 +111,11 @@ async function checkUserReacted(req, res, next) {
   try {
     const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
-    if (!reaction) {
-      // no reaction, new one should be created
-      return (res.reaction = false);
-    }
+    if (!reaction)
+      return res.status(403).json({
+        error: `Can't patch reaction unless it is posted and references BOTH logged-in user AND card.`
+      });
+
     res.reaction = reaction;
     next();
   } catch (error) {

@@ -40,11 +40,9 @@ const ReactionsService = {
       .into("jto_reacts")
       .returning("*")
       .then(([reaction]) => {
-        // console.log(reaction);
         return reaction;
       })
       .then((reaction) => {
-        // console.log(reaction);
         return ReactionsService.matchReaction(db, reaction.card_id, reaction.user_id);
       });
   },
