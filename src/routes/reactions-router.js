@@ -33,39 +33,37 @@ reactionsRouter
   .all(requireAuth)
   .all(checkUserReacted)
   .get((req, res, next) => {
+    // if you get a card, do a post
+    // if you don't, do a patch
     res.send(res.reaction).end();
   })
   .patch(jsonBodyParser, (req, res, next) => {
-    // console.log(res.reaction[0].id);
-    let { id, hearts } = res.reaction[0];
+    const { id, react_heart } = res.reaction[0];
+    console.log(react_heart);
     // console.log(ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate));
 
-    const reactionToUpdate = { react_hearts: "true" };
-    ReactionsService.updateReactions(req.app.get("db"), id, reactionToUpdate)
-      .then((numberRowsAffected) => {
-        return res.status(204).end();
-      })
-      .catch(next);
+    // ReactionsService.updateReactions(req.app.get("db"), id, reactionToUpdate)
+    //   .then((numberRowsAffected) => {
+    //     return res.status(204).end();
+    //   })
+    //   .catch(next);
+    if (react_heart === true) {
+      const updatedReaction = { react_heart: "false" };
 
-    // if (res.reaction.length !== 0) {
-    //   if (hearts === true) {
-    //     const reactionToUpdate = { react_hearts: "true" };
-    //     ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate)
-    //       .then((numberRowsAffected) => {
-    //         return res.status(204).end();
-    //       })
-    //       .catch(next);
-    //   } else {
-    //     const reactionToUpdate = { react_hearts: "true" };
-    //     ReactionsService.updateHearts(req.app.get("db"), id, reactionToUpdate)
-    //       .then((numberRowsAffected) => {
-    //         return res.status(204).end();
-    //       })
-    //       .catch(next);
-    //   }
-    // } else {
-    //   res.send("add new").end();
-    // }
+      ReactionsService.updateReactions(req.app.get("db"), id, updatedReaction)
+        .then((numRowsAffected) => {
+          return res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      const updatedReaction = { react_heart: "true" };
+
+      ReactionsService.updateReactions(req.app.get("db"), id, updatedReaction)
+        .then((numRowsAffected) => {
+          return res.status(204).end();
+        })
+        .catch(next);
+    }
   });
 
 reactionsRouter
