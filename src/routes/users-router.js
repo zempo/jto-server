@@ -41,7 +41,7 @@ usersRouter
 
         // then we insert the new user
         let insertedUser = await service.insertUser(req.app.get("db"), user);
-        if (!insertedUser) return res.status(500).json({ error: "Sorry, something is wrong with our servers :/" });
+        if (!insertedUser) return res.status(500).json({ error: "Sorry, our servers appear to be down :/" });
 
         return res
           .status(201)
