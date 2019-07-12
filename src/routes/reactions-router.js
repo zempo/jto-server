@@ -34,6 +34,7 @@ reactionsRouter
   .patch(checkUserReacted, jsonBodyParser, (req, res, next) => {
     // IF res.reaction, do PATCH
     // IF NO res.reaction do POST
+    // console.log(res.reaction[0])
     const { id, react_heart } = res.reaction[0];
     if (react_heart === true) {
       const updatedReaction = { react_heart: "false" };

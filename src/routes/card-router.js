@@ -28,10 +28,14 @@ cardRouter
   .get((req, res) => {
     res.json(CardsService.serializeCard(res.card));
   })
-  .delete(requireAuth, (req, res) => {
+  .delete(requireAuth, (req, res, next) => {
     if (req.user.admin) {
       // make a delete service
-      PrivateService.deleteCard(req.app.get("db"), req.params.card_id);
+      PrivateService.deleteCard(req.app.get("db"), res.card["id"])
+        .then((numberRowsAffected) => {
+          res.status(204).end();
+        })
+        .catch(next);
     } else {
       res.status(403).end();
     }

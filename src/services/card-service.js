@@ -58,7 +58,7 @@ const CardsService = {
 
 const userFields = [
   "usr.id AS user:id",
-  "user.admin AS user:admin",
+  "usr.admin AS user:admin",
   "usr.user_name AS user:user_name",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
