@@ -1,5 +1,6 @@
 CREATE TABLE jto_users (
 id SERIAL PRIMARY KEY,
+admin boolean DEFAULT FALSE,
 user_name TEXT NOT NULL UNIQUE,
 full_name TEXT NOT NULL,
 password TEXT NOT NULL,

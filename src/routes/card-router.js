@@ -27,6 +27,14 @@ cardRouter
   .all(checkCardExists)
   .get((req, res) => {
     res.json(CardsService.serializeCard(res.card));
+  })
+  .delete(requireAuth, (req, res) => {
+    if (req.user.admin) {
+      // make a delete service
+      PrivateService.deleteCard(req.app.get("db"), req.params.card_id);
+    } else {
+      res.status(403).end();
+    }
   });
 
 cardRouter

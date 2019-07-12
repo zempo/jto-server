@@ -7,11 +7,11 @@ TRUNCATE
   jto_users
   RESTART IDENTITY CASCADE;
 
-INSERT INTO jto_users (user_name, full_name, email, password)
+INSERT INTO jto_users (admin, user_name, full_name, email, password)
     VALUES
-    ('the_card_czar', 'Sandra Connor', 'sandraconnors@yahoo.com', '$2a$10$i57JnoTkJYAT3uFoPtSOze2FJziY6ldRtDHwTrnoDPpbYSMpxhRqq'),
-    ('greet-expectations', 'Mike Man', 'jenglish@uk.gov', '$2a$10$HlKayYzBDUqodJDIzzJIgOcxGlgoGKG2tdqiRcfRbONRscR6cLbNq'),
-    ('mindy-city', 'Mindy Momo', 'mmomo@gmail.com', '$2a$10$xK7keBV2VfSBU9P4W9ENYu5DX96Zn4ONnTuihzeXDmY552gmk5FuC');
+    (TRUE, 'the_card_czar', 'Sandra Connor', 'sandraconnors@yahoo.com', '$2a$10$i57JnoTkJYAT3uFoPtSOze2FJziY6ldRtDHwTrnoDPpbYSMpxhRqq'),
+    (default, 'greet-expectations', 'Mike Man', 'jenglish@uk.gov', '$2a$10$HlKayYzBDUqodJDIzzJIgOcxGlgoGKG2tdqiRcfRbONRscR6cLbNq'),
+    (default, 'mindy-city', 'Mindy Momo', 'mmomo@gmail.com', '$2a$10$xK7keBV2VfSBU9P4W9ENYu5DX96Zn4ONnTuihzeXDmY552gmk5FuC');
 
 INSERT INTO jto_cards 
     (theme, front_message, front_image, inside_message, inside_image, user_id, public)

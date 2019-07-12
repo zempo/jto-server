@@ -46,15 +46,15 @@ commentsRouter
   .all(requireAuth)
   .all(checkCommentExists)
   .get((req, res) => {
-    // console.log(res.comment.user.id)
-    if (req.user.id === res.comment.user.id) {
+    // if you're an admin or the user, you can access a comment dialogue box (which has edit/delete)
+    if (req.user.id === res.comment.user.id || req.user.admin) {
       res.json(CommentsService.serializeComment(res.comment));
     } else {
       res.status(403).end();
     }
   })
   .delete((req, res, next) => {
-    if (req.user.id === res.comment.user.id) {
+    if (req.user.id === res.comment.user.id || req.user.admin) {
       // res.json(CommentsService.serializeComment(res.comment))
       CommentsService.deleteComment(req.app.get("db"), req.params.comment_id)
         .then((numberRowsAffected) => {
@@ -76,7 +76,7 @@ commentsRouter
       });
     }
 
-    if (req.user.id === res.comment.user.id) {
+    if (req.user.id === res.comment.user.id || req.user.admin) {
       CommentsService.updateComment(req.app.get("db"), req.params.comment_id, commentToUpdate).then(
         (numberRowsAffected) => {
           res.status(204).end();
