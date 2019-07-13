@@ -9,16 +9,38 @@ const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*
 const optimizeSwearjar = (str) => {
   // For other methods
   // let swears = [];
+  // create a separate list of swear words and export the list as a regex expression
 
   // Process string
   let processedStr = str
     .toLowerCase()
+    .replace(/[0]/g, "o")
+    .replace(/[1]/g, "l")
+    .replace(/[!]/g, "l")
+    .replace(/[3]/g, "e")
+    .replace(/[4]/g, "f")
+    .replace(/[5]/g, "s")
+    .replace(/[6]/g, "b")
+    .replace(/[8]/g, "b")
+    .replace(/[$]/g, "s")
+    .replace(/[@]/g, "a");
+
+  let processedStr2 = str
+    .toLowerCase()
+    .replace(/[0]/g, "o")
+    .replace(/[1]/g, "i")
+    .replace(/[!]/g, "i")
+    .replace(/[3]/g, "e")
+    .replace(/[4]/g, "h")
+    .replace(/[5]/g, "s")
+    .replace(/[6]/g, "b")
+    .replace(/[8]/g, "b")
     .replace(/[$]/g, "s")
     .replace(/[@]/g, "a");
 
   console.log(processedStr);
   for (let key in swearjar._badWords) {
-    if (swearjar._badWords.hasOwnProperty(key) && processedStr.includes(key)) {
+    if (swearjar._badWords.hasOwnProperty(key) && (processedStr.includes(key) || processedStr2.includes(key))) {
       return true;
     }
   }
@@ -59,7 +81,7 @@ const UsersService = {
     return null;
   },
   validateUserName(user_name) {
-    // console.log(swearjar.profane(user_name));
+    // console.log(swearjar.scorecard(user_name));
     // console.log(optimizeSwearjar(user_name));
     if (optimizeSwearjar(user_name)) {
       return "Username must not contain any profanity.";
