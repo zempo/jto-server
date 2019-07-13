@@ -1,10 +1,29 @@
 const xss = require("xss");
 const bcrypt = require("bcryptjs");
 const validator = require("email-validator");
+const swearjar = require("swearjar");
 // validator.validate(email) ==> outputs boolean
 
 // setup
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
+const optimizeSwearjar = (str) => {
+  // For other methods
+  // let swears = [];
+
+  // Process string
+  let processedStr = str
+    .toLowerCase()
+    .replace(/[$]/g, "s")
+    .replace(/[@]/g, "a");
+
+  console.log(processedStr);
+  for (let key in swearjar._badWords) {
+    if (swearjar._badWords.hasOwnProperty(key) && processedStr.includes(key)) {
+      return true;
+    }
+  }
+  return false;
+};
 
 const UsersService = {
   insertUser(db, newUser) {
@@ -39,6 +58,23 @@ const UsersService = {
     // if loops through and finds all keys
     return null;
   },
+  validateUserName(user_name) {
+    // console.log(swearjar.profane(user_name));
+    // console.log(optimizeSwearjar(user_name));
+    if (optimizeSwearjar(user_name)) {
+      return "Username must not contain any profanity.";
+    }
+    if (user_name.length < 3) {
+      return "Username must be longer than 3 characters.";
+    }
+    if (user_name.length > 72) {
+      return "Username must be less than 72 characters.";
+    }
+    if (user_name.startsWith(" ") || user_name.endsWith(" ")) {
+      return "Username must not start or end with empty spaces";
+    }
+    return null;
+  },
   validateEmail(email) {
     if (validator.validate(email) == false) {
       return "Invalid email";
@@ -57,6 +93,12 @@ const UsersService = {
     }
     if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
       return "Password must contain 1 upper case, lower case, number and special character";
+    }
+    return null;
+  },
+  validateFullName(name) {
+    if (name.length > 150) {
+      return "Full names shall be abbreviated to 150 characters based on Minnesota Statutory Law. Please reach out to our support team if you would like to create an account for the kitten who walks across your keyboard.";
     }
     return null;
   },

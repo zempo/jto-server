@@ -1,10 +1,9 @@
 const express = require("express");
 const path = require("path");
-const uuid = require("uuid/v4");
 const { isWebUri } = require("valid-url");
-
-// setup
 const { requireAuth } = require("../middleware/jwt-auth");
+const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = require("../config");
+// setup
 const privateRouter = express.Router();
 const jsonBodyParser = express.json();
 const PrivateService = require("../services/private-service");
