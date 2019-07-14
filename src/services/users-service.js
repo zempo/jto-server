@@ -5,42 +5,62 @@ const swearjar = require("swearjar");
 // validator.validate(email) ==> outputs boolean
 
 // setup
+const REGEX_ALPHA_NUM_UNDERSCORE = /(^[A-Za-z0-9\-\_]+$)/;
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 const optimizeSwearjar = (str) => {
-  // For other methods
-  // let swears = [];
-  // create a separate list of swear words and export the list as a regex expression
+  let customList = process.env.SWEARS.split(" ");
 
   // Process string
   let processedStr = str
     .toLowerCase()
+    .replace(/\s/g, "")
+    .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
     .replace(/[0]/g, "o")
     .replace(/[1]/g, "l")
     .replace(/[!]/g, "l")
+    .replace(/[2]/g, "t")
     .replace(/[3]/g, "e")
     .replace(/[4]/g, "f")
     .replace(/[5]/g, "s")
     .replace(/[6]/g, "b")
+    .replace(/[7]/g, "t")
     .replace(/[8]/g, "b")
     .replace(/[$]/g, "s")
     .replace(/[@]/g, "a");
 
   let processedStr2 = str
     .toLowerCase()
+    .replace(/\s/g, "")
+    .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
     .replace(/[0]/g, "o")
     .replace(/[1]/g, "i")
     .replace(/[!]/g, "i")
+    .replace(/[2]/g, "t")
     .replace(/[3]/g, "e")
     .replace(/[4]/g, "h")
     .replace(/[5]/g, "s")
     .replace(/[6]/g, "b")
+    .replace(/[7]/g, "t")
     .replace(/[8]/g, "b")
     .replace(/[$]/g, "s")
     .replace(/[@]/g, "a");
 
-  console.log(processedStr);
+  let processedStr3 = str
+    .toLowerCase()
+    .replace(/[\^]/g, "a")
+    .replace(/[\&]/g, "d");
+
+  let result = customList.filter((swear) => {
+    if (processedStr.includes(swear) || processedStr2.includes(swear)) {
+      return true;
+    }
+  });
   for (let key in swearjar._badWords) {
-    if (swearjar._badWords.hasOwnProperty(key) && (processedStr.includes(key) || processedStr2.includes(key))) {
+    if (
+      (swearjar._badWords.hasOwnProperty(key) && (processedStr.includes(key) || processedStr2.includes(key))) ||
+      processedStr3.includes(key) ||
+      result.length > 0
+    ) {
       return true;
     }
   }
@@ -81,10 +101,9 @@ const UsersService = {
     return null;
   },
   validateUserName(user_name) {
-    // console.log(swearjar.scorecard(user_name));
-    // console.log(optimizeSwearjar(user_name));
+    console.log(REGEX_ALPHA_NUM_UNDERSCORE.test(user_name));
     if (optimizeSwearjar(user_name)) {
-      return "Username must not contain any profanity.";
+      return "Username must not contain any profanity nor violate community guidelines.";
     }
     if (user_name.length < 3) {
       return "Username must be longer than 3 characters.";
