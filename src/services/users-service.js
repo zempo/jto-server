@@ -11,54 +11,42 @@ const optimizeSwearjar = (str) => {
   let customList = process.env.SWEARS.split(" ");
 
   // Process string
-  let processedStr = str
+  let comparisonStr = str
     .toLowerCase()
     .replace(/\s/g, "")
-    .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+    .replace(/[-_]/g, "")
     .replace(/[0]/g, "o")
     .replace(/[1]/g, "l")
-    .replace(/[!]/g, "l")
     .replace(/[2]/g, "t")
     .replace(/[3]/g, "e")
     .replace(/[4]/g, "f")
     .replace(/[5]/g, "s")
     .replace(/[6]/g, "b")
     .replace(/[7]/g, "t")
-    .replace(/[8]/g, "b")
-    .replace(/[$]/g, "s")
-    .replace(/[@]/g, "a");
+    .replace(/[8]/g, "b");
 
-  let processedStr2 = str
+  let comparisonStr2 = str
     .toLowerCase()
     .replace(/\s/g, "")
-    .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+    .replace(/[-_]/g, "")
     .replace(/[0]/g, "o")
     .replace(/[1]/g, "i")
-    .replace(/[!]/g, "i")
     .replace(/[2]/g, "t")
     .replace(/[3]/g, "e")
     .replace(/[4]/g, "h")
     .replace(/[5]/g, "s")
     .replace(/[6]/g, "b")
     .replace(/[7]/g, "t")
-    .replace(/[8]/g, "b")
-    .replace(/[$]/g, "s")
-    .replace(/[@]/g, "a");
-
-  let processedStr3 = str
-    .toLowerCase()
-    .replace(/[\^]/g, "a")
-    .replace(/[\&]/g, "d");
+    .replace(/[8]/g, "b");
 
   let result = customList.filter((swear) => {
-    if (processedStr.includes(swear) || processedStr2.includes(swear)) {
+    if (comparisonStr.includes(swear) || comparisonStr2.includes(swear)) {
       return true;
     }
   });
   for (let key in swearjar._badWords) {
     if (
-      (swearjar._badWords.hasOwnProperty(key) && (processedStr.includes(key) || processedStr2.includes(key))) ||
-      processedStr3.includes(key) ||
+      (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
       result.length > 0
     ) {
       return true;
@@ -101,9 +89,11 @@ const UsersService = {
     return null;
   },
   validateUserName(user_name) {
-    console.log(REGEX_ALPHA_NUM_UNDERSCORE.test(user_name));
+    if (!REGEX_ALPHA_NUM_UNDERSCORE.test(user_name)) {
+      return "Username can only consist of alphanumeric characters, underscores, or hyphens.";
+    }
     if (optimizeSwearjar(user_name)) {
-      return "Username must not contain any profanity nor violate community guidelines.";
+      return "Username must not contain any profanity nor reference controversial figures.";
     }
     if (user_name.length < 3) {
       return "Username must be longer than 3 characters.";

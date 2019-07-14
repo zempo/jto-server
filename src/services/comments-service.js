@@ -1,4 +1,5 @@
 const xss = require("xss");
+const swearjar = require("swearjar");
 
 const CommentsService = {
   getById(db, id) {
@@ -58,6 +59,85 @@ const CommentsService = {
       date_created: comment.date_created,
       user: comment.user || {}
     };
+  },
+  checkAllFields(comment) {
+    for (const [key, value] of Object.entries(comment)) {
+      if (value == null && (key === body || key === card_id)) {
+        return `Missing required '${key}' to create new comment`;
+      }
+    }
+    // if loops through and finds all keys
+    return null;
+  },
+  setId(comment, id) {
+    return (comment.user_id = id);
+  },
+  sanitizeComment(str) {
+    let customList = process.env.SWEARS.split(" ");
+    let sanitizeStr = str;
+    let wordsToRmv = [];
+
+    // Process string
+    let comparisonStr = sanitizeStr
+      .toLowerCase()
+      .replace(/\s/g, "")
+      .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "l")
+      .replace(/[!]/g, "l")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "f")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let comparisonStr2 = sanitizeStr
+      .toLowerCase()
+      .replace(/\s/g, "")
+      .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "i")
+      .replace(/[!]/g, "i")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "h")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let comparisonStr3 = sanitizeStr
+      .toLowerCase()
+      .replace(/[\^]/g, "a")
+      .replace(/[\&]/g, "d");
+
+    let result = customList.filter((swear) => {
+      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear)) {
+        wordsToRmv.push(swear);
+        return true;
+      }
+    });
+    for (let key in swearjar._badWords) {
+      if (
+        (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
+        comparisonStr3.includes(key)
+      ) {
+        wordsToRmv.push(key);
+      }
+    }
+    // otherwise don't return sanitized string
+    let astrix = "*";
+    sanitizedStr = sanitizeStr
+      .split(" ")
+      .map((word) => (wordsToRmv.includes(word) ? astrix.repeat(word.length) : word))
+      .join(" ");
+    return sanitizedStr;
   }
 };
 

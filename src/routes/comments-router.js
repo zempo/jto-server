@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
-const uuid = require("uuid/v4");
-const { isWebUri } = require("valid-url");
+const swearjar = require("swearjar");
 const CommentsService = require("../services/comments-service");
 const { requireAuth } = require("../middleware/jwt-auth");
 
@@ -12,28 +11,34 @@ const jsonBodyParser = express.json();
 // allow for comment deletion functionality
 commentsRouter.route("/").post(requireAuth, jsonBodyParser, (req, res, next) => {
   const { body, card_id } = req.body;
-
-  const newComment = { body, card_id };
-
-  for (const [key, value] of Object.entries(newComment)) {
-    if (value == null) {
-      return res.status(400).json({
-        error: `Missing '${key}' in request body`
-      });
-    }
-  }
+  let newComment = { body, card_id };
 
   newComment.user_id = req.user.id;
 
-  CommentsService.insertComment(req.app.get("db"), newComment)
-    .then((comment) => {
-      // console.log(comment)
-      res
+  async function validateComment(comment, service) {
+    try {
+      let missingKeys = await service.checkAllFields(comment);
+      if (missingKeys) return res.status(400).json({ error: missingKeys });
+
+      let filteredComment = await CommentsService.sanitizeComment(comment.body);
+      if (filteredComment) {
+        comment.body = filteredComment;
+      }
+
+      let insertedComment = await service.insertComment(req.app.get("db"), comment);
+      if (!insertedComment) return res.status(500).json({ error: "Sorry, our servers appear to be down :/" });
+
+      return res
         .status(201)
-        .location(path.posix.join(req.originalUrl, `/${comment.id}`))
-        .json(CommentsService.serializeComment(comment));
-    })
-    .catch(next);
+        .location(path.posix.join(req.originalUrl, `/${insertedComment.id}`))
+        .json(service.serializeComment(insertedComment));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  const result = validateComment(newComment, CommentsService);
+  result;
 });
 
 // post new comment --> get comments
