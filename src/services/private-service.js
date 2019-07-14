@@ -1,6 +1,7 @@
 const xss = require("xss");
 const Treeize = require("treeize");
 const { isWebUri } = require("valid-url");
+const swearjar = require("swearjar");
 
 const PrivateService = {
   getPrivateCards(db, user_id) {
@@ -16,6 +17,7 @@ const PrivateService = {
         "card.inside_message",
         "card.inside_image",
         "card.date_created",
+        "card.date_modified",
         "card.public",
         ...userFields
       )
@@ -37,6 +39,7 @@ const PrivateService = {
         "card.inside_message",
         "card.inside_image",
         "card.date_created",
+        "card.date_modified",
         "card.public",
         ...userFields
       )
@@ -139,9 +142,70 @@ const PrivateService = {
       inside_message: xss(cardData.inside_message),
       inside_image: xss(cardData.inside_image),
       date_created: cardData.date_created,
+      date_modified: cardData.date_modified || null,
       public: cardData.public,
       user: cardData.user || {}
     };
+  },
+  sanitizeCard(str) {
+    let customList = process.env.SWEARS.split(" ");
+    let sanitizeStr = str;
+
+    // Process string
+    let comparisonStr = sanitizeStr
+      .toLowerCase()
+      .replace(/\s/g, "")
+      .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "l")
+      .replace(/[!]/g, "l")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "f")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let comparisonStr2 = sanitizeStr
+      .toLowerCase()
+      .replace(/\s/g, "")
+      .replace(/[.'-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "i")
+      .replace(/[!]/g, "i")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "h")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let comparisonStr3 = sanitizeStr
+      .toLowerCase()
+      .replace(/[\^]/g, "a")
+      .replace(/[\&]/g, "d");
+
+    let result = customList.filter((swear) => {
+      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
+        return true;
+      }
+    });
+    for (let key in swearjar._badWords) {
+      if (
+        (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
+        comparisonStr3.includes(key) ||
+        result.length > 0
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 };
 

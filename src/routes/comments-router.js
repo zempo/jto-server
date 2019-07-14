@@ -71,15 +71,17 @@ commentsRouter
     }
   })
   .patch(jsonBodyParser, (req, res, next) => {
-    const { body, date_created } = req.body;
-    const commentToUpdate = { body, date_created };
+    const { body } = req.body;
+    const commentToUpdate = { body };
 
     const numberOfValues = Object.values(commentToUpdate).filter(Boolean).length;
     if (numberOfValues === 0) {
       return res.status(400).json({
-        error: `Request body must contain either the comment body or comment date`
+        error: `Request body must contain the comment body`
       });
     }
+    commentToUpdate.body = CommentsService.sanitizeComment(body);
+    commentToUpdate.date_modified = new Date().toLocaleString();
 
     if (req.user.id === res.comment.user.id || req.user.admin) {
       CommentsService.updateComment(req.app.get("db"), req.params.comment_id, commentToUpdate).then(

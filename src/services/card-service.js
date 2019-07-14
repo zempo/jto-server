@@ -13,6 +13,7 @@ const CardsService = {
         "card.inside_message",
         "card.inside_image",
         "card.date_created",
+        "card.date_modified",
         "card.public",
         ...userFields,
         db.raw(`count(DISTINCT comments) AS number_of_comments`)
@@ -49,6 +50,7 @@ const CardsService = {
       inside_message: xss(cardData.inside_message),
       inside_image: xss(cardData.inside_image),
       date_created: cardData.date_created,
+      date_modified: cardData.date_modified || null,
       public: cardData.public,
       user: cardData.user || {},
       number_of_comments: Number(cardData.number_of_comments) || 0

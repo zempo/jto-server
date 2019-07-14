@@ -9,6 +9,7 @@ const CommentsService = {
         "comment.id",
         "comment.body",
         "comment.date_created",
+        "comment.date_modified",
         "comment.card_id",
         db.raw(
           `row_to_json(
@@ -57,6 +58,7 @@ const CommentsService = {
       body: xss(comment.body),
       card_id: comment.card_id,
       date_created: comment.date_created,
+      date_modified: comment.date_modified,
       user: comment.user || {}
     };
   },

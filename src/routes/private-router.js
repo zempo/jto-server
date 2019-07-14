@@ -14,9 +14,6 @@ privateRouter
   .all(requireAuth)
   .all(checkForPrivateCards)
   .get((req, res) => {
-    // console.log(req.user)
-    // console.log(res.cards[0]['user:id'])
-    // or if admin boolean, eventually?
     if (req.user.id === res.cards[0]["user:id"]) {
       res.json(PrivateService.serializeCards(res.cards));
     } else {
@@ -35,6 +32,10 @@ privateRouter
       return res.status(400).json({ error: `Image url must be valid url.` });
     } else if (inside_image && !isWebUri(inside_image)) {
       return res.status(400).json({ error: `Image url must be valid url.` });
+    } else if (PrivateService.sanitizeCard(front_message) || PrivateService.sanitizeCard(inside_message)) {
+      return res
+        .status(400)
+        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
     }
 
     newCard.user_id = req.user.id;
@@ -82,10 +83,23 @@ privateRouter
     const { theme, front_message, front_image, inside_message, inside_image } = req.body;
 
     const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
+    cardToUpdate.date_modified = new Date().toLocaleString();
 
     const error = PrivateService.patchValidator(cardToUpdate);
     if (error) {
       return res.status(400).json(error);
+    }
+
+    if (front_message && PrivateService.sanitizeCard(front_message)) {
+      return res
+        .status(400)
+        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
+    }
+
+    if (inside_message && PrivateService.sanitizeCard(inside_message)) {
+      return res
+        .status(400)
+        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
     }
 
     if (req.user.id === res.card[0]["user:id"]) {
