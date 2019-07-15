@@ -2,11 +2,17 @@ const express = require("express");
 const path = require("path");
 const { isWebUri } = require("valid-url");
 const { requireAuth } = require("../middleware/jwt-auth");
+const cloudinary = require("cloudinary");
 const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = require("../config");
 // setup
 const privateRouter = express.Router();
 const jsonBodyParser = express.json();
 const PrivateService = require("../services/private-service");
+cloudinary.config({
+  cloud_name: CLOUDINARY_NAME,
+  api_key: CLOUDINARY_API_KEY,
+  api_secret: CLOUDINARY_API_SECRET
+});
 
 // auth required for user's cards
 privateRouter
@@ -32,10 +38,6 @@ privateRouter
       return res.status(400).json({ error: `Image url must be valid url.` });
     } else if (inside_image && !isWebUri(inside_image)) {
       return res.status(400).json({ error: `Image url must be valid url.` });
-    } else if (PrivateService.sanitizeCard(front_message) || PrivateService.sanitizeCard(inside_message)) {
-      return res
-        .status(400)
-        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
     }
 
     newCard.user_id = req.user.id;
@@ -88,18 +90,6 @@ privateRouter
     const error = PrivateService.patchValidator(cardToUpdate);
     if (error) {
       return res.status(400).json(error);
-    }
-
-    if (front_message && PrivateService.sanitizeCard(front_message)) {
-      return res
-        .status(400)
-        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
-    }
-
-    if (inside_message && PrivateService.sanitizeCard(inside_message)) {
-      return res
-        .status(400)
-        .json({ error: "Card cannot contain profanity and/or text that violates community guidelines." });
     }
 
     if (req.user.id === res.card[0]["user:id"]) {

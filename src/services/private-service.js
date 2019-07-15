@@ -91,6 +91,14 @@ const PrivateService = {
         return {
           error: `Invalid theme supplied.`
         };
+      } else if (front_message && PrivateService.sanitizeCard(front_message)) {
+        return {
+          error: "Card cannot contain profanity and/or text that violates community guidelines."
+        };
+      } else if (inside_message && PrivateService.sanitizeCard(inside_message)) {
+        return {
+          error: "Card cannot contain profanity and/or text that violates community guidelines."
+        };
       } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
         return {
           error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
@@ -115,6 +123,14 @@ const PrivateService = {
       // console.log(themeRegex.test(theme) == false);
       return {
         error: `Invalid theme supplied.`
+      };
+    } else if (front_message && PrivateService.sanitizeCard(front_message)) {
+      return {
+        error: "Card cannot contain profanity and/or text that violates community guidelines."
+      };
+    } else if (inside_message && PrivateService.sanitizeCard(inside_message)) {
+      return {
+        error: "Card cannot contain profanity and/or text that violates community guidelines."
       };
     } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
       return {
