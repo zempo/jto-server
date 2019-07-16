@@ -2,16 +2,47 @@ const express = require("express");
 const path = require("path");
 const { isWebUri } = require("valid-url");
 const { requireAuth } = require("../middleware/jwt-auth");
+// cloudinary
 const cloudinary = require("cloudinary");
 const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = require("../config");
+const formData = require("express-form-data");
 // setup
 const privateRouter = express.Router();
+privateRouter.use(formData.parse());
 const jsonBodyParser = express.json();
 const PrivateService = require("../services/private-service");
+const CloudService = require("../services/cloud-service");
+
 cloudinary.config({
   cloud_name: CLOUDINARY_NAME,
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET
+});
+
+privateRouter.route("/images").post((req, res, next) => {
+  // upload the files, first
+  // console.log(req.files);
+  async function processImages(files, service) {
+    try {
+      const sizeError = await service.validateSize(files);
+      if (sizeError) {
+        return res.status(413).json({ error: sizeError });
+      }
+
+      const sendToCloud = await service.uploadByFilePath(files);
+      if (sendToCloud.find((file) => file === "NSFW content added")) {
+        return res.status(400).json({ error: "No inappropriate images accepted" });
+      }
+
+      console.log(sendToCloud);
+
+      return res.location(req.originalUrl).send(sendToCloud);
+    } catch (error) {
+      next(error);
+    }
+  }
+  const processedImages = processImages(req.files, CloudService);
+  processedImages;
 });
 
 // auth required for user's cards
@@ -142,6 +173,20 @@ async function checkCardStillPrivate(req, res, next) {
       });
 
     res.card = card;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function sendToCloud(files, service) {
+  try {
+    const sendToCloud = await service.uploadByFilePath(files);
+    if (sendToCloud.find((file) => file === "NSFW content added")) {
+      return res.status(400).json({ error: "No inappropriate images accepted" });
+    }
+
+    res.cloud = sendToCloud;
     next();
   } catch (error) {
     next(error);
