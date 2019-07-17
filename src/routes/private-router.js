@@ -19,6 +19,7 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET
 });
 
+// to-do: require auth
 privateRouter.route("/images").post((req, res, next) => {
   // upload the files, first
   // console.log(req.files);
