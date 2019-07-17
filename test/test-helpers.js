@@ -280,10 +280,10 @@ function makeExpectedPrivateCard(users, card) {
     inside_message: card.inside_message,
     inside_image: card.inside_image,
     date_created: card.date_created,
+    date_modified: card.date_modified,
     public: card.public,
     user: {
       id: user.id,
-      admin: user.admin,
       user_name: user.user_name,
       date_created: user.date_created
     }

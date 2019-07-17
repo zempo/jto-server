@@ -23,18 +23,18 @@ describe("Endpoints for a user's private cards", function() {
 
   // beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-  describe.only(`GET user's private cards at /api/private/cards/:user_id`, () => {
+  describe(`GET user's private cards at /api/private/cards/:user_id`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     context(`Given a user without private cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 200 and an empty list for a user with no private cards`, () => {
         let userToQuery = 2;
-        console.log(testUsers[1].id);
+
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(200, []);
+          .expect(404, { error: "This user has no private cards at the moment." });
       });
     });
 
@@ -56,10 +56,10 @@ describe("Endpoints for a user's private cards", function() {
             // console.log(helpers.makeExpectedPrivateCard(testUsers, card));
             return helpers.makeExpectedPrivateCard(testUsers, card);
           });
-        console.log(helpers.makeAuthHeader(testUsers[1]));
+        // console.log(expectedCards);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
-          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .expect(200, expectedCards);
       });
     });

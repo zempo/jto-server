@@ -157,6 +157,7 @@ privateRouter
 async function checkForPrivateCards(req, res, next) {
   try {
     const cards = await PrivateService.getPrivateCards(req.app.get("db"), req.params.user_id);
+    if (cards.length === 0) return res.status(404).json({ error: "This user has no private cards at the moment." });
 
     res.cards = cards;
     next();
@@ -180,18 +181,18 @@ async function checkCardStillPrivate(req, res, next) {
   }
 }
 
-async function sendToCloud(files, service) {
-  try {
-    const sendToCloud = await service.uploadByFilePath(files);
-    if (sendToCloud.find((file) => file === "NSFW content added")) {
-      return res.status(400).json({ error: "No inappropriate images accepted" });
-    }
+// async function sendToCloud(files, service) {
+//   try {
+//     const sendToCloud = await service.uploadByFilePath(files);
+//     if (sendToCloud.find((file) => file === "NSFW content added")) {
+//       return res.status(400).json({ error: "No inappropriate images accepted" });
+//     }
 
-    res.cloud = sendToCloud;
-    next();
-  } catch (error) {
-    next(error);
-  }
-}
+//     res.cloud = sendToCloud;
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// }
 
 module.exports = privateRouter;
