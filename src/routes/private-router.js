@@ -35,7 +35,7 @@ privateRouter.route("/images").post((req, res, next) => {
         return res.status(400).json({ error: "No inappropriate images accepted" });
       }
 
-      console.log(sendToCloud);
+      // console.log(sendToCloud);
 
       return res.location(req.originalUrl).send(sendToCloud);
     } catch (error) {
