@@ -117,6 +117,23 @@ describe("Protected endpoints reject unathorized users.", () => {
         it(`responds with 401: 'Missing Bearer Token', when no token`, () => {
           return endpoint.method(endpoint.path).expect(401, { error: "Missing Bearer Token" });
         });
+
+        it(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+          const validUser = testUsers[0];
+          const invalidSecret = "bad-secret";
+          return endpoint
+            .method(endpoint.path)
+            .set("Authorization", helpers.makeAuthHeader(validUser, invalidSecret))
+            .expect(401, { error: `Unauthorized Request` });
+        });
+
+        it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
+          const invalidUser = { email: "user-not-existy", id: 1 };
+          return endpoint
+            .method(endpoint.path)
+            .set("Authorization", helpers.makeAuthHeader(invalidUser))
+            .expect(401, { error: `Unauthorized Request` });
+        });
       }
     });
   });
