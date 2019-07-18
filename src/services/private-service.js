@@ -180,6 +180,7 @@ const PrivateService = {
         return true;
       }
     });
+    // console.log(revised);
 
     if (revised.length > 0) {
       return true;
@@ -192,7 +193,8 @@ const PrivateService = {
   },
   sanitizeCard(str) {
     let customList = process.env.SWEARS.split(" ");
-    let okList = process.env.NONSWEARS1.split(" ");
+    let okStr = process.env.NONSWEARS1;
+    let okList = okStr.split(" ");
     let sanitizeStr = str;
     let swearjarSwears = Object.keys(swearjar._badWords);
 
