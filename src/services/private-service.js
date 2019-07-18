@@ -81,8 +81,7 @@ const PrivateService = {
     const spaceRegex = /^\S*$/;
 
     for (const [key, value] of Object.entries({ theme, front_message, front_image, inside_message, inside_image })) {
-      // console.log((!isWebUri(front_image) || !isWebUri(inside_image)) && (key === front_image || key === inside_image));
-      if (value == null && (key === theme || key === front_message || key === inside_message)) {
+      if ((key === theme || key === front_message || key === inside_message) && value == null) {
         return {
           error: `Missing '${key}' in request body. Images are not required.`
         };
@@ -163,9 +162,39 @@ const PrivateService = {
       user: cardData.user || {}
     };
   },
+  compareFilters(whiteList1, blackList1, blackList2, str, str2) {
+    let diff = whiteList1.filter((x) => !blackList1.includes(x));
+
+    let strNew = str
+      .split(" ")
+      .map((word) => (diff.includes(word) ? "" : word))
+      .join(" ");
+
+    let strNew2 = str2
+      .split(" ")
+      .map((word) => (diff.includes(word) ? "" : word))
+      .join(" ");
+
+    let revised = blackList1.filter((swear) => {
+      if (strNew.includes(swear) || strNew2.includes(swear)) {
+        return true;
+      }
+    });
+
+    if (revised.length > 0) {
+      return true;
+    }
+    if (blackList2.length > 0) {
+      return true;
+    }
+
+    return false;
+  },
   sanitizeCard(str) {
     let customList = process.env.SWEARS.split(" ");
+    let okList = process.env.NONSWEARS1.split(" ");
     let sanitizeStr = str;
+    let swearjarSwears = Object.keys(swearjar._badWords);
 
     // Process string
     let comparisonStr = sanitizeStr
@@ -207,21 +236,56 @@ const PrivateService = {
       .replace(/[\^]/g, "a")
       .replace(/[\&]/g, "d");
 
-    let result = customList.filter((swear) => {
+    let comparisonStr4 = sanitizeStr
+      .toLowerCase()
+      .replace(/[.',-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "l")
+      .replace(/[!]/g, "l")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "f")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let comparisonStr5 = sanitizeStr
+      .toLowerCase()
+      .replace(/[.',-_~\%\^\&*\)\(+=]/g, "")
+      .replace(/[0]/g, "o")
+      .replace(/[1]/g, "i")
+      .replace(/[!]/g, "i")
+      .replace(/[2]/g, "t")
+      .replace(/[3]/g, "e")
+      .replace(/[4]/g, "h")
+      .replace(/[5]/g, "s")
+      .replace(/[6]/g, "b")
+      .replace(/[7]/g, "t")
+      .replace(/[8]/g, "b")
+      .replace(/[$]/g, "s")
+      .replace(/[@]/g, "a");
+
+    let blackList1 = swearjarSwears.filter((swear) => {
       if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
         return true;
       }
     });
-    for (let key in swearjar._badWords) {
-      if (
-        (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
-        comparisonStr3.includes(key) ||
-        result.length > 0
-      ) {
+    let blackList2 = customList.filter((swear) => {
+      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
         return true;
       }
-    }
-    return false;
+    });
+
+    let whiteList1 = okList.filter((nonswear) => {
+      if (comparisonStr.includes(nonswear) || comparisonStr2.includes(nonswear) || comparisonStr3.includes(nonswear)) {
+        return true;
+      }
+    });
+
+    return PrivateService.compareFilters(whiteList1, blackList1, blackList2, comparisonStr4, comparisonStr5);
   }
 };
 

@@ -28,7 +28,7 @@ describe("Endpoints for a user's private cards", function() {
     context(`Given a user without private cards`, () => {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it(`Responds with 200 and an empty list for a user with no private cards`, () => {
+      it(`Responds with a 404 for a user with no private cards`, () => {
         let userToQuery = 2;
 
         return supertest(app)
@@ -45,7 +45,6 @@ describe("Endpoints for a user's private cards", function() {
         let userToQuery = 1;
         const expectedCards = testCards
           .filter((card, i, cards) => {
-            // console.log(userToQuery)
             if (card["public"] == false && card["user_id"] == userToQuery) {
               return true;
             } else {
@@ -53,10 +52,8 @@ describe("Endpoints for a user's private cards", function() {
             }
           })
           .map((card) => {
-            // console.log(helpers.makeExpectedPrivateCard(testUsers, card));
             return helpers.makeExpectedPrivateCard(testUsers, card);
           });
-        // console.log(expectedCards);
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
@@ -73,20 +70,7 @@ describe("Endpoints for a user's private cards", function() {
       it(`Responds with a 404 and error message.`, () => {
         let userToQuery = 1;
         let cardToQuery = 999999042;
-        const expectedCard = testCards
-          .filter((card, i, cards) => {
-            // console.log(userToQuery)
-            if (card["public"] == false && card["user_id"] == userToQuery && card["id"] == cardToQuery) {
-              return true;
-            } else {
-              return false;
-            }
-          })
-          .map((card) => {
-            // console.log(helpers.makeExpectedPrivateCard(testUsers, card));
-            return helpers.makeExpectedPrivateCard(testUsers, card);
-          });
-        // console.log(expectedCard);
+
         return supertest(app)
           .get(`/api/private/cards/${userToQuery}/${cardToQuery}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
@@ -119,5 +103,9 @@ describe("Endpoints for a user's private cards", function() {
           .expect(200, expectedCard);
       });
     });
+  });
+
+  describe("POST a new card", () => {
+    context("Invalid or inappropriate fields in the request body", () => {});
   });
 });

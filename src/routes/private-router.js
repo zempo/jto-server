@@ -63,26 +63,25 @@ privateRouter
 
     const newCard = { theme, front_message, front_image, inside_message, inside_image };
 
-    const error = PrivateService.postValidator(newCard);
-    if (error) {
-      return res.status(400).json(error);
-    } else if (front_image && !isWebUri(front_image)) {
-      return res.status(400).json({ error: `Image url must be valid url.` });
-    } else if (inside_image && !isWebUri(inside_image)) {
-      return res.status(400).json({ error: `Image url must be valid url.` });
-    }
+    async function validateCard(card, service) {
+      try {
+        const error = await service.postValidator(card);
+        if (error) return res.status(400).json(error);
+        card.user_id = req.user.id;
 
-    newCard.user_id = req.user.id;
+        const insertedCard = await service.insertCard(req.app.get("db"), card);
 
-    PrivateService.insertCard(req.app.get("db"), newCard)
-      .then((card) => {
-        // console.log(card[0]["id"]);
         return res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${card[0]["id"]}`))
-          .json(PrivateService.serializeCard(card[0]));
-      })
-      .catch(next);
+          .location(path.posix.join(req.originalUrl, `/${insertedCard[0]["id"]}`))
+          .json(PrivateService.serializeCard(insertedCard[0]));
+      } catch (error) {
+        next(error);
+      }
+    }
+
+    const result = validateCard(newCard, PrivateService);
+    result;
   });
 
 // Auth required
@@ -180,19 +179,5 @@ async function checkCardStillPrivate(req, res, next) {
     next(error);
   }
 }
-
-// async function sendToCloud(files, service) {
-//   try {
-//     const sendToCloud = await service.uploadByFilePath(files);
-//     if (sendToCloud.find((file) => file === "NSFW content added")) {
-//       return res.status(400).json({ error: "No inappropriate images accepted" });
-//     }
-
-//     res.cloud = sendToCloud;
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// }
 
 module.exports = privateRouter;

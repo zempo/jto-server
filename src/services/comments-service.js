@@ -76,6 +76,7 @@ const CommentsService = {
   },
   sanitizeComment(str) {
     let customList = process.env.SWEARS.split(" ");
+    let okList = process.env.NONSWEARS2.split(" ");
     let sanitizeStr = str;
     let wordsToRmv = [];
 
@@ -120,15 +121,23 @@ const CommentsService = {
       .replace(/[\&]/g, "d");
 
     let result = customList.filter((swear) => {
-      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear)) {
+      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
         wordsToRmv.push(swear);
         return true;
       }
     });
+
+    let result2 = okList.filter((nonswear) => {
+      if (comparisonStr.includes(nonswear) || comparisonStr2.includes(nonswear) || comparisonStr3.includes(nonswear)) {
+        return true;
+      }
+    });
     for (let key in swearjar._badWords) {
+      let falsePositive = result2.find((word) => word === key);
       if (
-        (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
-        comparisonStr3.includes(key)
+        ((swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
+          comparisonStr3.includes(key)) &&
+        falsePositive == undefined
       ) {
         wordsToRmv.push(key);
       }

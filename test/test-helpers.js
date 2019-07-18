@@ -283,6 +283,68 @@ function makeExpectedCard(users, card, comments = []) {
   };
 }
 
+function makeMaliciousCard(user) {
+  const maliciousCard = {
+    id: 666,
+    theme: "kiddo",
+    front_image: "http://placehold.it/500x500",
+    front_message: `Hacky-sack <script>alert("we are anonymous");</script>`,
+    inside_image: "http://placehold.it/500x500",
+    inside_message: `Evil greetings! <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. Hackity Sax`,
+    date_created: new Date().toISOString(),
+    date_modified: null,
+    user_id: user.id,
+    public: true
+  };
+  const expectedCard = {
+    ...makeExpectedCard([user], maliciousCard),
+    front_message: `Hacky-sack &lt;script&gt;alert("we are anonymous");&lt;/script&gt;`,
+    inside_message: `Evil greetings! <img src="https://url.to.file.which/does-not.exist">. Hackity Sax`
+  };
+  return {
+    maliciousCard,
+    expectedCard
+  };
+}
+
+function makeInappropriateCard(user) {
+  const profaneCard = {
+    id: 69,
+    theme: "kiddo",
+    front_image: "http://placehold.it/500x500",
+    front_message: `Hell butt`,
+    inside_image: "http://placehold.it/500x500",
+    inside_message: `Evil greetings! <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. Hackity Sax`,
+    date_created: new Date().toISOString(),
+    date_modified: null,
+    user_id: user.id,
+    public: true
+  };
+  const user = users.find((user) => user.id === card.user_id);
+
+  const cardComments = comments.filter((comment) => comment.card_id === card.id);
+  const number_of_comments = cardComments.length;
+
+  return {
+    id: card.id,
+    theme: card.theme,
+    front_message: card.front_message,
+    front_image: card.front_image,
+    inside_message: card.inside_message,
+    inside_image: card.inside_image,
+    date_created: card.date_created,
+    date_modified: card.date_modified,
+    public: card.public,
+    user: {
+      id: user.id,
+      admin: user.admin,
+      user_name: user.user_name,
+      date_created: user.date_created
+    },
+    number_of_comments
+  };
+}
+
 function makeExpectedPrivateCard(users, card) {
   const user = users.find((user) => user.id === card.user_id);
   return {
@@ -429,6 +491,7 @@ module.exports = {
   makeUsersArray,
   makeCardsArray,
   makeExpectedCard,
+  makeMaliciousCard,
   makeExpectedPrivateCard,
   makeExpectedComments,
   makeExpectedCardComments,
