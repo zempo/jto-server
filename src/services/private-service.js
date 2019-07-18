@@ -90,18 +90,12 @@ const PrivateService = {
         return {
           error: `Invalid theme supplied.`
         };
-      } else if (front_message && PrivateService.sanitizeCard(front_message)) {
-        return {
-          error: "Card cannot contain profanity and/or text that violates community guidelines."
-        };
-      } else if (inside_message && PrivateService.sanitizeCard(inside_message)) {
-        return {
-          error: "Card cannot contain profanity and/or text that violates community guidelines."
-        };
       } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
         return {
           error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
         };
+      } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
+        return { error: `Card images must be valid URL` };
       }
     }
 
@@ -123,14 +117,6 @@ const PrivateService = {
       return {
         error: `Invalid theme supplied.`
       };
-    } else if (front_message && PrivateService.sanitizeCard(front_message)) {
-      return {
-        error: "Card cannot contain profanity and/or text that violates community guidelines."
-      };
-    } else if (inside_message && PrivateService.sanitizeCard(inside_message)) {
-      return {
-        error: "Card cannot contain profanity and/or text that violates community guidelines."
-      };
     } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
       return {
         error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
@@ -139,6 +125,15 @@ const PrivateService = {
       return { error: `Card images must be valid URL` };
     }
 
+    return NO_ERRORS;
+  },
+  correctUser(loggedInId, targetId) {
+    const NO_ERRORS = null;
+    if (loggedInId !== targetId) {
+      return {
+        error: `User does not match card`
+      };
+    }
     return NO_ERRORS;
   },
   serializeCards(cards) {
@@ -162,41 +157,11 @@ const PrivateService = {
       user: cardData.user || {}
     };
   },
-  compareFilters(whiteList1, blackList1, blackList2, str, str2) {
-    let diff = whiteList1.filter((x) => !blackList1.includes(x));
-
-    let strNew = str
-      .split(" ")
-      .map((word) => (diff.includes(word) ? "" : word))
-      .join(" ");
-
-    let strNew2 = str2
-      .split(" ")
-      .map((word) => (diff.includes(word) ? "" : word))
-      .join(" ");
-
-    let revised = blackList1.filter((swear) => {
-      if (strNew.includes(swear) || strNew2.includes(swear)) {
-        return true;
-      }
-    });
-    // console.log(revised);
-
-    if (revised.length > 0) {
-      return true;
-    }
-    if (blackList2.length > 0) {
-      return true;
-    }
-
-    return false;
-  },
   sanitizeCard(str) {
     let customList = process.env.SWEARS.split(" ");
-    let okStr = process.env.NONSWEARS1;
-    let okList = okStr.split(" ");
+    let okList = process.env.NONSWEARS2.split(" ");
     let sanitizeStr = str;
-    let swearjarSwears = Object.keys(swearjar._badWords);
+    let wordsToRmv = [];
 
     // Process string
     let comparisonStr = sanitizeStr
@@ -238,56 +203,35 @@ const PrivateService = {
       .replace(/[\^]/g, "a")
       .replace(/[\&]/g, "d");
 
-    let comparisonStr4 = sanitizeStr
-      .toLowerCase()
-      .replace(/[.',-_~\%\^\&*\)\(+=]/g, "")
-      .replace(/[0]/g, "o")
-      .replace(/[1]/g, "l")
-      .replace(/[!]/g, "l")
-      .replace(/[2]/g, "t")
-      .replace(/[3]/g, "e")
-      .replace(/[4]/g, "f")
-      .replace(/[5]/g, "s")
-      .replace(/[6]/g, "b")
-      .replace(/[7]/g, "t")
-      .replace(/[8]/g, "b")
-      .replace(/[$]/g, "s")
-      .replace(/[@]/g, "a");
-
-    let comparisonStr5 = sanitizeStr
-      .toLowerCase()
-      .replace(/[.',-_~\%\^\&*\)\(+=]/g, "")
-      .replace(/[0]/g, "o")
-      .replace(/[1]/g, "i")
-      .replace(/[!]/g, "i")
-      .replace(/[2]/g, "t")
-      .replace(/[3]/g, "e")
-      .replace(/[4]/g, "h")
-      .replace(/[5]/g, "s")
-      .replace(/[6]/g, "b")
-      .replace(/[7]/g, "t")
-      .replace(/[8]/g, "b")
-      .replace(/[$]/g, "s")
-      .replace(/[@]/g, "a");
-
-    let blackList1 = swearjarSwears.filter((swear) => {
+    let result = customList.filter((swear) => {
       if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
-        return true;
-      }
-    });
-    let blackList2 = customList.filter((swear) => {
-      if (comparisonStr.includes(swear) || comparisonStr2.includes(swear) || comparisonStr3.includes(swear)) {
+        wordsToRmv.push(swear);
         return true;
       }
     });
 
-    let whiteList1 = okList.filter((nonswear) => {
+    let result2 = okList.filter((nonswear) => {
       if (comparisonStr.includes(nonswear) || comparisonStr2.includes(nonswear) || comparisonStr3.includes(nonswear)) {
         return true;
       }
     });
-
-    return PrivateService.compareFilters(whiteList1, blackList1, blackList2, comparisonStr4, comparisonStr5);
+    for (let key in swearjar._badWords) {
+      let falsePositive = result2.find((word) => word === key);
+      if (
+        ((swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
+          comparisonStr3.includes(key)) &&
+        falsePositive == undefined
+      ) {
+        wordsToRmv.push(key);
+      }
+    }
+    // otherwise don't return sanitized string
+    let astrix = "*";
+    sanitizedStr = sanitizeStr
+      .split(" ")
+      .map((word) => (wordsToRmv.includes(word) ? astrix.repeat(word.length) : word))
+      .join(" ");
+    return sanitizedStr;
   }
 };
 

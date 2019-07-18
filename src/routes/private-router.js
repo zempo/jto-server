@@ -69,6 +69,15 @@ privateRouter
         if (error) return res.status(400).json(error);
         card.user_id = req.user.id;
 
+        const sanitizeFront = await service.sanitizeCard(card.front_message);
+        if (sanitizeFront) {
+          card.front_message = sanitizeFront;
+        }
+        const sanitizeInside = await service.sanitizeCard(card.inside_message);
+        if (sanitizeInside) {
+          card.inside_message = sanitizeInside;
+        }
+
         const insertedCard = await service.insertCard(req.app.get("db"), card);
 
         return res
@@ -118,20 +127,37 @@ privateRouter
     const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
     cardToUpdate.date_modified = new Date().toLocaleString();
 
-    const error = PrivateService.patchValidator(cardToUpdate);
-    if (error) {
-      return res.status(400).json(error);
+    async function correctPatch(card, service) {
+      try {
+        const wrongUser = await service.correctUser(req.user.id, res.card[0]["user:id"]);
+        if (wrongUser) return res.status(403).json(wrongUser);
+
+        const error = await service.patchValidator(card);
+        if (error) return res.status(400).json(error);
+        // card.user_id = req.user.id;
+
+        const sanitizeFront = await service.sanitizeCard(card.front_message);
+        if (sanitizeFront) {
+          card.front_message = sanitizeFront;
+        }
+        const sanitizeInside = await service.sanitizeCard(card.inside_message);
+        if (sanitizeInside) {
+          card.inside_message = sanitizeInside;
+        }
+
+        const updatedCard = await service.updateCard(req.app.get("db"), req.params.card_id, card);
+        if (!updatedCard) {
+          return res.status(404).send(":/ ");
+        }
+
+        return res.status(204).end();
+      } catch (error) {
+        next(error);
+      }
     }
 
-    if (req.user.id === res.card[0]["user:id"]) {
-      PrivateService.updateCard(req.app.get("db"), req.params.card_id, cardToUpdate)
-        .then((numberRowsAffected) => {
-          return res.status(204).end();
-        })
-        .catch(next);
-    } else {
-      res.status(403).end();
-    }
+    const result = correctPatch(cardToUpdate, PrivateService);
+    result;
   });
 
 // toggle a card's privacy
