@@ -20,13 +20,13 @@ commentsRouter.route("/").post(requireAuth, jsonBodyParser, (req, res, next) => 
       let missingKeys = await service.checkAllFields(comment);
       if (missingKeys) return res.status(400).json({ error: missingKeys });
 
-      let filteredComment = await CommentsService.sanitizeComment(comment.body);
+      let filteredComment = await service.sanitizeComment(comment.body);
       if (filteredComment) {
         comment.body = filteredComment;
       }
 
       let insertedComment = await service.insertComment(req.app.get("db"), comment);
-      if (!insertedComment) return res.status(500).json({ error: "Sorry, our servers appear to be down :/" });
+      if (!insertedComment) return res.status(409).json({ error: "request timeout" });
 
       return res
         .status(201)
@@ -74,24 +74,35 @@ commentsRouter
     const { body } = req.body;
     const commentToUpdate = { body };
 
-    const numberOfValues = Object.values(commentToUpdate).filter(Boolean).length;
-    if (numberOfValues === 0) {
-      return res.status(400).json({
-        error: `Request body must contain the comment body`
-      });
-    }
-    commentToUpdate.body = CommentsService.sanitizeComment(body);
     commentToUpdate.date_modified = new Date().toLocaleString();
 
-    if (req.user.id === res.comment.user.id || req.user.admin) {
-      CommentsService.updateComment(req.app.get("db"), req.params.comment_id, commentToUpdate).then(
-        (numberRowsAffected) => {
-          res.status(204).end();
+    // console.log(CommentsService.correctUser(req.user.id, res.comment.user.id));
+    async function correctPatch(comment, service) {
+      try {
+        let missingKeys = await service.checkAllFields(comment);
+        if (missingKeys) return res.status(400).json({ error: missingKeys });
+
+        const wrongUser = await service.correctUser(req.user.id, res.comment.user.id);
+        if (wrongUser && !req.user.admin) return res.status(403).json(wrongUser);
+
+        const sanitizeComment = await service.sanitizeComment(comment.body);
+        if (sanitizeComment) {
+          comment.body = sanitizeComment;
         }
-      );
-    } else {
-      res.status(403).end();
+
+        const updatedComment = await service.updateComment(req.app.get("db"), req.params.comment_id, comment);
+        if (!updatedComment) {
+          return res.status(409).json({ error: "request timeout" });
+        }
+
+        return res.status(204).end();
+      } catch (error) {
+        next(error);
+      }
     }
+
+    const result = correctPatch(commentToUpdate, CommentsService);
+    result;
   });
 
 async function checkCommentExists(req, res, next) {

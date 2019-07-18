@@ -64,7 +64,7 @@ const CommentsService = {
   },
   checkAllFields(comment) {
     for (const [key, value] of Object.entries(comment)) {
-      if (value == null && (key === body || key === card_id)) {
+      if (value == null) {
         return `Missing required '${key}' to create new comment`;
       }
     }
@@ -73,6 +73,15 @@ const CommentsService = {
   },
   setId(comment, id) {
     return (comment.user_id = id);
+  },
+  correctUser(loggedInId, targetId) {
+    const NO_ERRORS = null;
+    if (loggedInId !== targetId) {
+      return {
+        error: `User does not match card`
+      };
+    }
+    return NO_ERRORS;
   },
   sanitizeComment(str) {
     let customList = process.env.SWEARS.split(" ");

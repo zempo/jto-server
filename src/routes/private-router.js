@@ -147,7 +147,7 @@ privateRouter
 
         const updatedCard = await service.updateCard(req.app.get("db"), req.params.card_id, card);
         if (!updatedCard) {
-          return res.status(404).send(":/ ");
+          return res.status(409).json({ error: "request timeout" });
         }
 
         return res.status(204).end();
