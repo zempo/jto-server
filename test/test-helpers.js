@@ -5,7 +5,7 @@ function makeUsersArray() {
   return [
     {
       id: 1,
-      admin: false,
+      admin: true,
       user_name: "test-user-1",
       full_name: "Test User One",
       password: "password",
@@ -117,6 +117,19 @@ function makeCardsArray(users) {
       id: 6,
       theme: "cursive-plus",
       front_message: "Greeting 6",
+      front_image: "https://loremflickr.com/g/500/400/flowers",
+      inside_message:
+        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
+      inside_image: "https://loremflickr.com/g/300/300/flowers",
+      date_created: "2029-01-22T16:28:32.615Z",
+      date_modified: null,
+      public: true,
+      user_id: users[3].id
+    },
+    {
+      id: 7,
+      theme: "kiddo",
+      front_message: "Greeting 7",
       front_image: "https://loremflickr.com/g/500/400/flowers",
       inside_message:
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
@@ -299,6 +312,7 @@ function makeExpectedComments(users, card_id, comments) {
       id: comment.id,
       body: comment.body,
       date_created: comment.date_created,
+      date_modified: comment.date_modified,
       card_id: comment.card_id,
       user: {
         id: commentUser.id,
@@ -309,6 +323,21 @@ function makeExpectedComments(users, card_id, comments) {
         date_created: commentUser.date_created,
         date_modified: commentUser.date_modified
       }
+    };
+  });
+}
+
+function makeExpectedCardComments(card_id, comments) {
+  const expectedComments = comments.filter((comment) => comment.card_id === card_id);
+
+  return expectedComments.map((comment) => {
+    return {
+      id: comment.id,
+      body: comment.body,
+      date_created: comment.date_created,
+      date_modified: comment.date_modified,
+      card_id: comment.card_id,
+      user_id: comment.user_id
     };
   });
 }
@@ -402,6 +431,7 @@ module.exports = {
   makeExpectedCard,
   makeExpectedPrivateCard,
   makeExpectedComments,
+  makeExpectedCardComments,
   makeExpectedReactions,
   makeCommentsArray,
   makeReactsArray,

@@ -92,4 +92,64 @@ describe("Cards endpoints", function() {
       });
     });
   });
+
+  describe("GET comments of a card at /api/cards/comments/:card_id", () => {
+    context("The card exists, but there are no comments", () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it("Responds with 200 and empty array", () => {
+        let card_id = 7;
+
+        return supertest(app)
+          .get(`/api/cards/comments/${card_id}`)
+          .expect(200, []);
+      });
+    });
+
+    context("The card exists and has comments", () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+      it("Responds with 200 and the corresponding comments", () => {
+        let card_id = 6;
+        const expectedCardComments = helpers.makeExpectedCardComments(card_id, testComments);
+
+        return supertest(app)
+          .get(`/api/cards/comments/${card_id}`)
+          .expect(200, expectedCardComments);
+      });
+    });
+  });
+
+  describe("PATCH the privacy of a card at /api/cards/make-private/:card_id", () => {
+    context("The card has already been made private", () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 404 because the resource has been moved or deleted`, () => {
+        let card_id = 4;
+        return supertest(app)
+          .patch(`/api/cards/make-private/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .expect(404, { error: `This public card no longer exists. It might have been deleted or made private.` });
+      });
+    });
+
+    context("The card is public", () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 403 because the card does not belong to the user`, () => {
+        let card_id = 5;
+        return supertest(app)
+          .patch(`/api/cards/make-private/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(403);
+      });
+
+      it(`Responds with 204 because the card exists and belongs to the user`, () => {
+        let card_id = 5;
+        return supertest(app)
+          .patch(`/api/cards/make-private/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .expect(204);
+      });
+    });
+  });
 });
