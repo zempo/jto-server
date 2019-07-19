@@ -81,7 +81,6 @@ const PrivateService = {
     const spaceRegex = /^\S*$/;
 
     for (const [key, value] of Object.entries(card)) {
-      console.log(key === "theme");
       if (value == null && (key === "theme" || key === "inside_message" || key === "front_message")) {
         return {
           error: `Missing '${key}' in request body. Images are not required.`

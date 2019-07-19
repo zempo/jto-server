@@ -110,15 +110,26 @@ describe("Endpoints for a user's private cards", function() {
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Throws error when theme is missing", () => {
         const testUser = testUsers[0];
-        const newCard = {
-          front_message: "blah"
-        };
+        const newCard = {};
 
         return supertest(app)
           .post(`/api/private/cards/${testUser.id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(newCard)
           .expect(400, { error: `Missing 'theme' in request body. Images are not required.` });
+      });
+
+      it("Throws error when theme is invalid", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "I am Iron Man"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `Invalid theme supplied.` });
       });
 
       it("Throws error when front_message is missing", () => {
@@ -146,6 +157,74 @@ describe("Endpoints for a user's private cards", function() {
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(newCard)
           .expect(400, { error: `Missing 'inside_message' in request body. Images are not required.` });
+      });
+
+      it("Throws error when front_message exceeds 100 characters", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message:
+            "Blah blah blah it takes a lot of time to get to 100 characters. Did you know about this? Gosh, I'm nearly bored to tears. Ooop, here I am. Finally!",
+          inside_message: "What he said..."
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, {
+            error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+          });
+      });
+
+      it("Throws error when inside_message exceeds 650 characters", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message: "What he said...",
+          inside_message:
+            "lorem is ipsum. Some ipsum. Most ipsum. lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum.lorem is ipsum. Some ipsum. Most ipsum."
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, {
+            error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+          });
+      });
+
+      it("If used, the front image must be a valid url", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message: "Blah",
+          inside_message: "Blah two",
+          front_image: "blah three!"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `If used, card images must be valid URL` });
+      });
+
+      it("If used, the inside_image must be valid url", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message: "Blah",
+          inside_message: "Blah two",
+          inside_image: "blah three!"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `If used, card images must be valid URL` });
       });
     });
   });
