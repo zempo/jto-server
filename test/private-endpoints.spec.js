@@ -105,7 +105,48 @@ describe("Endpoints for a user's private cards", function() {
     });
   });
 
-  describe("POST a new card", () => {
-    context("Invalid or inappropriate fields in the request body", () => {});
+  describe("POST /api/private/cards/:user_id", () => {
+    context("Invalid or inappropriate fields in the request body", () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+      it("Throws error when theme is missing", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          front_message: "blah"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `Missing 'theme' in request body. Images are not required.` });
+      });
+
+      it("Throws error when front_message is missing", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `Missing 'front_message' in request body. Images are not required.` });
+      });
+
+      it("Throws error when inside_message is missing", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message: "Blah"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(400, { error: `Missing 'inside_message' in request body. Images are not required.` });
+      });
+    });
   });
 });

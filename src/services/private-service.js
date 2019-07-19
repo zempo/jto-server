@@ -75,27 +75,31 @@ const PrivateService = {
       .where({ id })
       .update(newCardFields);
   },
-  postValidator({ theme, front_message, front_image, inside_message, inside_image }) {
+  postValidator(card) {
     const NO_ERRORS = null;
     const themeRegex = /^\S*\b(cursive|cursive-plus|handwritten-bold|handwritten|indie|kiddo|pen|quill|roboto|sharpie|typed)\b/;
     const spaceRegex = /^\S*$/;
 
-    for (const [key, value] of Object.entries({ theme, front_message, front_image, inside_message, inside_image })) {
-      if ((key === theme || key === front_message || key === inside_message) && value == null) {
+    for (const [key, value] of Object.entries(card)) {
+      console.log(key === "theme");
+      if (value == null && (key === "theme" || key === "inside_message" || key === "front_message")) {
         return {
           error: `Missing '${key}' in request body. Images are not required.`
         };
-      } else if (theme && (themeRegex.test(theme) == false || spaceRegex.test(theme) == false)) {
+      } else if (key === "theme" && (themeRegex.test(value) == false || spaceRegex.test(value) == false)) {
         // console.log(themeRegex.test(theme) == false);
         return {
           error: `Invalid theme supplied.`
         };
-      } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
+      } else if ((key === "front_message" && value.length > 100) || (key === "inside_message" && value.length > 650)) {
         return {
           error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
         };
-      } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
-        return { error: `Card images must be valid URL` };
+      } else if (
+        (key === "front_image" && value != null && !isWebUri(value)) ||
+        (key === "inside_image" && value != null && !isWebUri(value))
+      ) {
+        return { error: `If used, card images must be valid URL` };
       }
     }
 
@@ -122,7 +126,7 @@ const PrivateService = {
         error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
       };
     } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
-      return { error: `Card images must be valid URL` };
+      return { error: `If used, card images must be valid URL` };
     }
 
     return NO_ERRORS;

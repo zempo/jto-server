@@ -307,31 +307,6 @@ function makeMaliciousCard(user) {
   };
 }
 
-function makeInappropriateCard(user) {
-  const profaneCard = {
-    id: 69,
-    theme: "kiddo",
-    front_image: "http://placehold.it/500x500",
-    front_message: `Hell butt`,
-    inside_image: "http://placehold.it/500x500",
-    inside_message: `Evil greetings!`,
-    date_created: new Date().toISOString(),
-    date_modified: null,
-    user_id: user.id,
-    public: true
-  };
-  const expectedCard = {
-    ...makeExpectedCard([user], profaneCard),
-    front_message: `**** ****`,
-    inside_message: `Evil greetings!`
-  };
-
-  return {
-    profaneCard,
-    expectedCard
-  };
-}
-
 function makeExpectedPrivateCard(users, card) {
   const usr = users.find((user) => user.id === card.user_id);
   return {
@@ -465,6 +440,10 @@ function seedCardsTables(db, users, cards, comments = [], reacts = []) {
     .then(() => reacts.length && db.into("jto_reacts").insert(reacts));
 }
 
+function seedMaliciousCard(db, user, card) {
+  return seedUsers(db, [user]).then(() => db.into("jto_cards").insert(card));
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.email,
@@ -479,7 +458,6 @@ module.exports = {
   makeCardsArray,
   makeExpectedCard,
   makeMaliciousCard,
-  makeInappropriateCard,
   makeExpectedPrivateCard,
   makeExpectedComments,
   makeExpectedCardComments,
@@ -490,5 +468,6 @@ module.exports = {
   cleanTables,
   seedUsers,
   seedCardsTables,
+  seedMaliciousCard,
   makeAuthHeader
 };

@@ -58,6 +58,25 @@ describe("Cards endpoints", function() {
           .expect(200, expectedCards);
       });
     });
+
+    context("Given an XSS attack card", () => {
+      const testUser = helpers.makeUsersArray()[0];
+      const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
+
+      beforeEach("Insert malicious card", () => {
+        return helpers.seedMaliciousCard(db, testUser, maliciousCard);
+      });
+
+      it("Removes XSS attack content", () => {
+        return supertest(app)
+          .get(`/api/cards`)
+          .expect(200)
+          .expect((res) => {
+            expect(res.body[0].front_message).to.eql(expectedCard.front_message);
+            expect(res.body[0].inside_message).to.eql(expectedCard.inside_message);
+          });
+      });
+    });
   });
 
   describe(`GET a public card at api/card/:card_id`, () => {
@@ -89,6 +108,25 @@ describe("Cards endpoints", function() {
         return supertest(app)
           .get(`/api/cards/${card_id}`)
           .expect(200, expectedCard);
+      });
+    });
+
+    context("Given an XSS attack card", () => {
+      const testUser = helpers.makeUsersArray()[0];
+      const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
+
+      beforeEach("Insert malicious card", () => {
+        return helpers.seedMaliciousCard(db, testUser, maliciousCard);
+      });
+
+      it("Removes XSS attack content", () => {
+        return supertest(app)
+          .get(`/api/cards/${maliciousCard.id}`)
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.front_message).to.eql(expectedCard.front_message);
+            expect(res.body.inside_message).to.eql(expectedCard.inside_message);
+          });
       });
     });
   });
