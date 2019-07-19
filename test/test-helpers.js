@@ -258,7 +258,7 @@ function makeReactsArray(users, cards) {
 }
 
 function makeExpectedCard(users, card, comments = []) {
-  const user = users.find((user) => user.id === card.user_id);
+  const usr = users.find((user) => user.id === card.user_id);
 
   const cardComments = comments.filter((comment) => comment.card_id === card.id);
   const number_of_comments = cardComments.length;
@@ -274,10 +274,10 @@ function makeExpectedCard(users, card, comments = []) {
     date_modified: card.date_modified,
     public: card.public,
     user: {
-      id: user.id,
-      admin: user.admin,
-      user_name: user.user_name,
-      date_created: user.date_created
+      id: usr.id,
+      admin: usr.admin,
+      user_name: usr.user_name,
+      date_created: usr.date_created
     },
     number_of_comments
   };
@@ -314,39 +314,26 @@ function makeInappropriateCard(user) {
     front_image: "http://placehold.it/500x500",
     front_message: `Hell butt`,
     inside_image: "http://placehold.it/500x500",
-    inside_message: `Evil greetings! <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. Hackity Sax`,
+    inside_message: `Evil greetings!`,
     date_created: new Date().toISOString(),
     date_modified: null,
     user_id: user.id,
     public: true
   };
-  const user = users.find((user) => user.id === card.user_id);
-
-  const cardComments = comments.filter((comment) => comment.card_id === card.id);
-  const number_of_comments = cardComments.length;
+  const expectedCard = {
+    ...makeExpectedCard([user], profaneCard),
+    front_message: `**** ****`,
+    inside_message: `Evil greetings!`
+  };
 
   return {
-    id: card.id,
-    theme: card.theme,
-    front_message: card.front_message,
-    front_image: card.front_image,
-    inside_message: card.inside_message,
-    inside_image: card.inside_image,
-    date_created: card.date_created,
-    date_modified: card.date_modified,
-    public: card.public,
-    user: {
-      id: user.id,
-      admin: user.admin,
-      user_name: user.user_name,
-      date_created: user.date_created
-    },
-    number_of_comments
+    profaneCard,
+    expectedCard
   };
 }
 
 function makeExpectedPrivateCard(users, card) {
-  const user = users.find((user) => user.id === card.user_id);
+  const usr = users.find((user) => user.id === card.user_id);
   return {
     id: card.id,
     theme: card.theme,
@@ -358,9 +345,9 @@ function makeExpectedPrivateCard(users, card) {
     date_modified: card.date_modified,
     public: card.public,
     user: {
-      id: user.id,
-      user_name: user.user_name,
-      date_created: user.date_created
+      id: usr.id,
+      user_name: usr.user_name,
+      date_created: usr.date_created
     }
   };
 }
@@ -492,6 +479,7 @@ module.exports = {
   makeCardsArray,
   makeExpectedCard,
   makeMaliciousCard,
+  makeInappropriateCard,
   makeExpectedPrivateCard,
   makeExpectedComments,
   makeExpectedCardComments,
