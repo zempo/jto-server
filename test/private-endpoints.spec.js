@@ -26,6 +26,7 @@ describe("Endpoints for a user's private cards", function () {
   describe(`GET user's private cards at /api/private/cards/:user_id`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     context(`Given a user without private cards`, () => {
+      after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with a 404 for a user with no private cards`, () => {
@@ -39,6 +40,7 @@ describe("Endpoints for a user's private cards", function () {
     });
 
     context(`Given a user has private cards`, () => {
+      after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 200 and all a given user's private cards`, () => {
@@ -65,6 +67,7 @@ describe("Endpoints for a user's private cards", function () {
   describe(`GET a single private card at /api/private/cards/:user_id/:card_id`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     context(`Given a user's private card has been moved or deleted`, () => {
+      after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with a 404 and error message.`, () => {
@@ -79,6 +82,7 @@ describe("Endpoints for a user's private cards", function () {
     });
 
     context(`Given a user's private card exists`, () => {
+      after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with a 200 and the card.`, () => {
@@ -308,7 +312,49 @@ describe("Endpoints for a user's private cards", function () {
   });
 
   describe('DELETE /api/private/cards/:user_id/:card_id', () => {
+    after("spacing", () => console.log("-------------------------------------\n"));
+    context('Given card no longer private, but exists', () => {
+      after("spacing", () => console.log("\n"));
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it('Responds with 404', () => {
+        const testUser = testUsers[0]
+        const testCard = testCards[1]
+        return supertest(app)
+          .delete(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .expect(404, { error: "This card is no longer private. It might have been deleted or made public." })
+      })
+    })
+
+    context('Given card no longer public', () => {
+      after("spacing", () => console.log("\n"));
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it(`Responds with 404 when card doesn't belong to user`, () => {
+        const testUser = testUsers[1]
+        const testCard = testCards[3]
+        return supertest(app)
+          .delete(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(404, { error: "This card is no longer private. It might have been deleted or made public." })
+      })
+
+      it(`Responds with 204 when card belongs to user`, () => {
+        const testUser = testUsers[2]
+        const testCard = testCards[7]
+        return supertest(app)
+          .delete(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[2]))
+          .expect(204)
+      })
+
+    })
+  })
+
+  describe('PATCH /api/private/cards/:user_id/:card_id', () => {
 
   })
+
 
 });

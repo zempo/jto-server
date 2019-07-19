@@ -138,6 +138,19 @@ function makeCardsArray(users) {
       date_modified: null,
       public: true,
       user_id: users[3].id
+    },
+    {
+      id: 8,
+      theme: "cursive-plus",
+      front_message: "Greeting 3",
+      front_image: "https://loremflickr.com/g/500/400/flowers",
+      inside_message:
+        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?",
+      inside_image: "https://loremflickr.com/g/300/300/flowers",
+      date_created: "2029-01-22T16:28:32.615Z",
+      date_modified: null,
+      public: false,
+      user_id: users[2].id
     }
   ];
 }
