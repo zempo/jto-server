@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Endpoints for a user's private cards", function() {
+describe("Endpoints for a user's private cards", function () {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
@@ -106,7 +106,9 @@ describe("Endpoints for a user's private cards", function() {
   });
 
   describe("POST /api/private/cards/:user_id", () => {
-    context("Invalid or inappropriate fields in the request body", () => {
+    after("spacing", () => console.log("-------------------------------------\n"));
+    context("Invalid Request Body", () => {
+      after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Throws error when theme is missing", () => {
         const testUser = testUsers[0];
@@ -227,5 +229,86 @@ describe("Endpoints for a user's private cards", function() {
           .expect(400, { error: `If used, card images must be valid URL` });
       });
     });
+
+    context('Inappropriate content in the request body.', () => {
+      after("spacer", () => console.log('\n'))
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+      it("Creates new card with profane words removed and detected", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "kiddo",
+          front_message: "hell butt one",
+          inside_message: "hell butt two"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(201)
+          .expect(res => {
+            expect(res.body.front_message).to.eql("**** **** one")
+            expect(res.body.inside_message).to.eql("**** **** two")
+          });
+      });
+    })
+
+    context('Malicious content in request body', () => {
+      // const testUser = helpers.makeUsersArray()[0];
+      // const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
+
+      // beforeEach("Insert malicious card", () => {
+      //   return helpers.seedMaliciousCard(db, testUser, maliciousCard);
+      // });
+
+      // to do: add xss test
+    })
+
+    context('Appropriate and complete request', () => {
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+
+      it("Creates a new card", () => {
+        const testUser = testUsers[0];
+        const newCard = {
+          theme: "handwritten",
+          front_message: "Happy New Greeting!",
+          inside_message: "May all your unit tests pass!",
+          inside_image: "https://picsum.photos/200/300",
+          front_image: "https://picsum.photos/200/300"
+        };
+
+        return supertest(app)
+          .post(`/api/private/cards/${testUser.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(newCard)
+          .expect(201)
+          .expect(res => {
+            expect(res.body).to.have.property("id")
+            expect(res.body).to.have.property("public")
+            expect(res.body.public).to.be.a('boolean')
+            expect(res.body.front_message).to.eql(newCard.front_message)
+            expect(res.body.front_image).to.eql(newCard.front_image)
+            expect(res.body.inside_message).to.eql(newCard.inside_message)
+            expect(res.body.inside_image).to.eql(newCard.inside_image)
+            expect(res.body.user).to.be.an("object")
+            expect(res.body.user).to.include({ id: testUser.id })
+            expect(res.body.user).to.include({ user_name: testUser.user_name })
+            expect(res.body.user).to.include({ date_created: testUser.date_created })
+
+            const expectedDate = new Date().toLocaleString("en", { timeZone: "America/Los_Angeles" });
+            const actualDate = new Date(res.body.date_created).toLocaleString();
+            // when testing for time, test this context by itself
+            // previous tests take approximately 1 minute to run on most machines
+            // this.retries() is insufficient
+
+            // expect(actualDate).to.eql(expectedDate);
+          });
+      });
+    })
   });
+
+  describe('DELETE /api/private/cards/:user_id/:card_id', () => {
+
+  })
+
 });
