@@ -111,7 +111,7 @@ describe("Endpoints for a user's private cards", function () {
 
   describe("POST /api/private/cards/:user_id", () => {
     after("spacing", () => console.log("-------------------------------------\n"));
-    context("Invalid Request Body", () => {
+    context("Given Invalid Request Body", () => {
       after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Throws error when theme is missing", () => {
@@ -301,7 +301,7 @@ describe("Endpoints for a user's private cards", function () {
 
             const expectedDate = new Date().toLocaleString("en", { timeZone: "America/Los_Angeles" });
             const actualDate = new Date(res.body.date_created).toLocaleString();
-            // when testing for time, test this context by itself
+            // when testing for time, test only this context
             // previous tests take approximately 1 minute to run on most machines
             // this.retries() is insufficient
 
@@ -313,7 +313,7 @@ describe("Endpoints for a user's private cards", function () {
 
   describe('DELETE /api/private/cards/:user_id/:card_id', () => {
     after("spacing", () => console.log("-------------------------------------\n"));
-    context('Given card no longer private, but exists', () => {
+    context('Given card not private, but exists', () => {
       after("spacing", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
@@ -327,17 +327,18 @@ describe("Endpoints for a user's private cards", function () {
       })
     })
 
-    context('Given card no longer public', () => {
+    context('Given card is private', () => {
       after("spacing", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
-      it(`Responds with 404 when card doesn't belong to user`, () => {
-        const testUser = testUsers[1]
-        const testCard = testCards[3]
+      it(`Responds with 403 when card doesn't belong to user`, () => {
+        const testUser = testUsers[2]
+        const hackerMan = testUsers[3]
+        const testCard = testCards[7]
         return supertest(app)
           .delete(`/api/private/cards/${testUser.id}/${testCard.id}`)
-          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "This card is no longer private. It might have been deleted or made public." })
+          .set("Authorization", helpers.makeAuthHeader(hackerMan))
+          .expect(403)
       })
 
       it(`Responds with 204 when card belongs to user`, () => {
@@ -353,7 +354,51 @@ describe("Endpoints for a user's private cards", function () {
   })
 
   describe('PATCH /api/private/cards/:user_id/:card_id', () => {
+    context.only('Given Invalid Request Body', () => {
+      after("spacer", () => console.log('\n'))
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+      it("Returns 400 error when request is empty", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2]
+        const updatedCard = {};
 
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image` });
+      });
+
+      it("Returns 400 error when theme is invalid", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2]
+        const updatedCard = {
+          theme: "comic sans"
+        };
+
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `Invalid theme supplied.` });
+      });
+
+      it("Returns 400 error when front message is too long", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2]
+        console.log(testCard)
+        const updatedCard = {
+          theme: "cursive-plus",
+          front_message: "too long too long too long is ipsum exceeding 100 characters takes less than one would imagine."
+        };
+
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `Invalid theme supplied.` });
+      });
+    })
   })
 
 

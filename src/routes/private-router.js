@@ -125,6 +125,10 @@ privateRouter
     const { theme, front_message, front_image, inside_message, inside_image } = req.body;
 
     const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
+    const numberOfValues = Object.values(cardToUpdate).filter(Boolean).length;
+    if (numberOfValues === 0) {
+      return res.status(400).json({ error: "Request body must include either theme, front_message, front_image, inside_message, or inside_image" })
+    }
     cardToUpdate.date_modified = new Date().toLocaleString();
 
     async function correctPatch(card, service) {
@@ -136,12 +140,12 @@ privateRouter
         if (error) return res.status(400).json(error);
         // card.user_id = req.user.id;
 
-        const sanitizeFront = await service.sanitizeCard(card.front_message);
-        if (sanitizeFront) {
+        if ((card.front_message != null)) {
+          const sanitizeFront = await service.sanitizeCard(card.front_message);
           card.front_message = sanitizeFront;
         }
-        const sanitizeInside = await service.sanitizeCard(card.inside_message);
-        if (sanitizeInside) {
+        if ((card.inside_message != null)) {
+          const sanitizeInside = await service.sanitizeCard(card.inside_message);
           card.inside_message = sanitizeInside;
         }
 

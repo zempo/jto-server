@@ -104,30 +104,37 @@ const PrivateService = {
 
     return NO_ERRORS;
   },
-  patchValidator({ theme, front_message, front_image, inside_message, inside_image }) {
+  patchValidator(card) {
     const NO_ERRORS = null;
     const themeRegex = /^\S*\b(cursive|cursive-plus|handwritten-bold|handwritten|indie|kiddo|pen|quill|roboto|sharpie|typed)\b/;
     const spaceRegex = /^\S*$/;
-    const numberOfValues = Object.values({ theme, front_message, front_image, inside_message, inside_image }).filter(
-      Boolean
-    ).length;
-    if (numberOfValues === 0) {
-      return {
-        error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image`
-      };
-    } else if (theme && (themeRegex.test(theme) == false || spaceRegex.test(theme) == false)) {
-      // console.log(themeRegex.test(theme) == false);
+    console.log(card.theme)
+
+    if (card.theme != null && (themeRegex.test(card.theme) == false || spaceRegex.test(card.theme) == false)) {
       return {
         error: `Invalid theme supplied.`
       };
-    } else if ((front_message && front_message.length > 100) || (inside_message && inside_message.length > 650)) {
-      return {
-        error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
-      };
-    } else if ((front_image && !isWebUri(front_image)) || (inside_image && !isWebUri(inside_image))) {
-      return { error: `If used, card images must be valid URL` };
+    } else if ((card.front_message != null)) {
+      if (card.front_message.length > 100) {
+        return {
+          error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+        };
+      }
+    } else if ((card.inside_message != null)) {
+      if (card.inside_message.length > 650) {
+        return {
+          error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.`
+        };
+      }
+    } else if ((card.front_image != null)) {
+      if (!isWebUri(card.front_image)) {
+        return { error: `If used, card images must be valid URL` };
+      }
+    } else if ((card.inside_image != null)) {
+      if (!isWebUri(card.inside_image)) {
+        return { error: `If used, card images must be valid URL` };
+      }
     }
-
     return NO_ERRORS;
   },
   correctUser(loggedInId, targetId) {
