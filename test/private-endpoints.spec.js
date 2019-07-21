@@ -354,7 +354,7 @@ describe("Endpoints for a user's private cards", function () {
   })
 
   describe('PATCH /api/private/cards/:user_id/:card_id', () => {
-    context.only('Given Invalid Request Body', () => {
+    context('Given Invalid Request Body', () => {
       after("spacer", () => console.log('\n'))
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Returns 400 error when request is empty", () => {
@@ -366,7 +366,7 @@ describe("Endpoints for a user's private cards", function () {
           .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(updatedCard)
-          .expect(400, { error: `At least one value must be updated. Updatable values: theme, front_message, front_image, inside_message, inside_image` });
+          .expect(400, { error: `Request body must include either theme, front_message, front_image, inside_message, or inside_image` });
       });
 
       it("Returns 400 error when theme is invalid", () => {
@@ -386,20 +386,107 @@ describe("Endpoints for a user's private cards", function () {
       it("Returns 400 error when front message is too long", () => {
         const testUser = testUsers[0];
         const testCard = testCards[2]
-        console.log(testCard)
         const updatedCard = {
           theme: "cursive-plus",
-          front_message: "too long too long too long is ipsum exceeding 100 characters takes less than one would imagine."
+          front_message: "too long too long too long is ipsum exceeding 100 characters takes less than one would imagine. Here we go here we go here we go",
+          inside_message: "haha! I can be 100 characcters. Not too long too long too long is ipsum exceeding 100 characters takes less than one would imagine. Here we go here we go here we go"
         };
 
         return supertest(app)
           .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(updatedCard)
-          .expect(400, { error: `Invalid theme supplied.` });
+          .expect(400, { error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.` });
+      });
+
+      it("Returns 400 error when inside message is too long", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2];
+        const updatedCard = {
+          theme: "cursive-plus",
+          inside_message: "too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go too long too long too long is ipsum exceeding 650 characters takes less than one would imagine. Here we go here we go here we go"
+        };
+
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `Front Message cannot exceed 100 characters in length. Inside message cannot exceed 650 characters.` });
+      });
+
+      it("Returns 400 error when front image is invalid url", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2]
+        const updatedCard = {
+          front_image: "some invalid url"
+        };
+
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `If used, card images must be valid URL` });
+      });
+
+      it("Returns 400 error when inside image is invalid url", () => {
+        const testUser = testUsers[0];
+        const testCard = testCards[2]
+        const updatedCard = {
+          front_image: "some invalid url"
+        };
+
+        return supertest(app)
+          .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedCard)
+          .expect(400, { error: `If used, card images must be valid URL` });
       });
     })
+
+    context('Malicious content in request body', () => {
+      // const testUser = helpers.makeUsersArray()[0];
+      // const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
+
+      // beforeEach("Insert malicious card", () => {
+      //   return helpers.seedMaliciousCard(db, testUser, maliciousCard);
+      // });
+
+      // to do: add xss test
+    })
+
+    context('Given valid request body', () => {
+      after("spacer", () => console.log('\n'))
+      beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
+      const validEntries = [
+        {
+          theme: "kiddo"
+        },
+        {
+          front_message: "Less than 100 characters"
+        },
+        {
+          front_image: "https://picsum.photos/200/300"
+        },
+        {
+          inside_message: "Less than 650 characters"
+        },
+        {
+          inside_image: "https://picsum.photos/200/300"
+        }
+      ]
+
+      validEntries.forEach(entry => {
+        it(`Updates ${Object.keys(entry)[0]}`, () => {
+          const testUser = testUsers[0];
+          const testCard = testCards[2];
+
+          return supertest(app)
+            .patch(`/api/private/cards/${testUser.id}/${testCard.id}`)
+            .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+            .send(entry)
+            .expect(204);
+        })
+      })
+    })
   })
-
-
 });

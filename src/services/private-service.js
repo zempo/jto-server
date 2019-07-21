@@ -108,7 +108,6 @@ const PrivateService = {
     const NO_ERRORS = null;
     const themeRegex = /^\S*\b(cursive|cursive-plus|handwritten-bold|handwritten|indie|kiddo|pen|quill|roboto|sharpie|typed)\b/;
     const spaceRegex = /^\S*$/;
-    console.log(card.theme)
 
     if (card.theme != null && (themeRegex.test(card.theme) == false || spaceRegex.test(card.theme) == false)) {
       return {
