@@ -340,11 +340,11 @@ function makeExpectedPrivateCard(users, card) {
   };
 }
 
-function makeExpectedComments(users, card_id, comments) {
-  const expectedComments = comments.filter((comment) => comment.card_id === card_id);
+function makeExpectedComments(users, comment_id, comments) {
+  const expectedComments = comments.filter((comment) => comment.id === comment_id);
 
   return expectedComments.map((comment) => {
-    const commentUser = users.find((user) => user.id === comment.user_id);
+    let commentUser = users.filter((usr) => usr.id === comment.user_id)[0];
     return {
       id: comment.id,
       body: comment.body,
@@ -353,11 +353,9 @@ function makeExpectedComments(users, card_id, comments) {
       card_id: comment.card_id,
       user: {
         id: commentUser.id,
+        admin: commentUser.admin,
         user_name: commentUser.user_name,
-        full_name: commentUser.full_name,
-        password: commentUser.password,
-        email: commentUser.email,
-        date_created: commentUser.date_created,
+        date_created: commentUser.date_created.substr(0, commentUser.date_created.length - 1),
         date_modified: commentUser.date_modified
       }
     };
@@ -409,6 +407,22 @@ function makeExpectedReactions(card, reacts = []) {
   };
 }
 
+function makeExpectedReactionsByUser(card_id, user_id, reactions) {
+  const expectedByCardAndUser = reactions.filter(
+    (reaction) => reaction.card_id === card_id && reaction.user_id === user_id
+  );
+
+  return expectedByCardAndUser.map((reaction) => {
+    return {
+      id: reaction.id,
+      card_id: reaction.card_id,
+      user_id: reaction.user_id,
+      react_heart: reaction.react_heart,
+      react_share: reaction.react_share
+    };
+  });
+}
+
 function makeJtoFixtures() {
   const testUsers = makeUsersArray();
   const testCards = makeCardsArray(testUsers);
@@ -453,6 +467,18 @@ function seedCardsTables(db, users, cards, comments = [], reacts = []) {
     .then(() => reacts.length && db.into("jto_reacts").insert(reacts));
 }
 
+function seedCardsTables2(db, users, cards, comments = [], reacts = []) {
+  return db.transaction(async (trx) => {
+    await seedUsers(trx, users);
+    await trx.into("jto_cards").insert(cards);
+    await trx.raw(`SELECT setval('jto_cards_id_seq', ?)`, [cards[cards.length - 1].id]);
+    await trx.into("jto_comments").insert(comments);
+    await trx.raw(`SELECT setval('jto_comments_id_seq', ?)`, [comments[comments.length - 1].id]);
+    await trx.into("jto_reacts").insert(reacts);
+    await trx.raw(`SELECT setval('jto_reacts_id_seq', ?)`, [reacts[reacts.length - 1].id]);
+  });
+}
+
 function seedMaliciousCard(db, user, card) {
   return seedUsers(db, [user]).then(() => db.into("jto_cards").insert(card));
 }
@@ -475,12 +501,14 @@ module.exports = {
   makeExpectedComments,
   makeExpectedCardComments,
   makeExpectedReactions,
+  makeExpectedReactionsByUser,
   makeCommentsArray,
   makeReactsArray,
   makeJtoFixtures,
   cleanTables,
   seedUsers,
   seedCardsTables,
+  seedCardsTables2,
   seedMaliciousCard,
   makeAuthHeader
 };

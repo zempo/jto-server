@@ -6,7 +6,7 @@ const { requireAuth } = require("../middleware/jwt-auth");
 const reactionsRouter = express.Router();
 const ReactionsService = require("../services/reactions-service");
 
-// No auth required
+// All cards
 reactionsRouter.route("/").get((req, res, next) => {
   ReactionsService.getPublicReactions(req.app.get("db"))
     .then((cards) => {
@@ -15,6 +15,7 @@ reactionsRouter.route("/").get((req, res, next) => {
     .catch(next);
 });
 
+// each card
 reactionsRouter
   .route("/:card_id")
   .all(checkCardExists)
@@ -25,7 +26,7 @@ reactionsRouter
 reactionsRouter
   .route("/hearts/:card_id")
   .all(requireAuth)
-  .get(checkUserReacted, (req, res, next) => {
+  .get(matchedReactions, (req, res, next) => {
     // if you get a card, do a post
     // if you don't, do a patch
     // optimize on front-end
@@ -54,7 +55,7 @@ reactionsRouter
         .catch(next);
     }
   })
-  .post(jsonBodyParser, (req, res, next) => {
+  .post(checkUserReactedOnce, jsonBodyParser, (req, res, next) => {
     // IF res.reaction, do PATCH
     // IF NO res.reaction do POST
     // let { react_heart } = req.body;
@@ -75,11 +76,10 @@ reactionsRouter
 reactionsRouter
   .route("/shares/:card_id")
   .all(requireAuth)
-  .all(checkUserReacted)
   .get((req, res, next) => {
     res.send(res.reaction).end();
   })
-  .patch(jsonBodyParser, (req, res, next) => {
+  .patch(checkUserReacted, jsonBodyParser, (req, res, next) => {
     const { id, react_share } = res.reaction[0];
 
     const updatedReaction = { react_share: "true" };
@@ -90,7 +90,7 @@ reactionsRouter
       })
       .catch(next);
   })
-  .post(jsonBodyParser, (req, res, next) => {
+  .post(checkUserReactedOnce, jsonBodyParser, (req, res, next) => {
     // IF res.reaction, do PATCH
     // IF NO res.reaction do POST
     // let { react_heart } = req.body;
@@ -110,12 +110,58 @@ reactionsRouter
 
 async function checkUserReacted(req, res, next) {
   try {
+    const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
+    if (!card) {
+      return res.status(404).json({
+        error: `This public card no longer exists. It might have been deleted or made private.`
+      });
+    }
+
     const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
-    if (!reaction)
+    if (reaction.length === 0)
       return res.status(403).json({
         error: `Can't patch reaction unless it is posted and references BOTH logged-in user AND card.`
       });
+
+    res.reaction = reaction;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function checkUserReactedOnce(req, res, next) {
+  try {
+    const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
+    if (!card) {
+      return res.status(404).json({
+        error: `This public card no longer exists. It might have been deleted or made private.`
+      });
+    }
+
+    const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
+
+    if (reaction.length > 0)
+      return res.status(403).json({
+        error: `Can't post reaction more than once.`
+      });
+
+    res.reaction = reaction;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function matchedReactions(req, res, next) {
+  try {
+    const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
+    if (!card)
+      return res.status(404).json({
+        error: `This public card no longer exists. It might have been deleted or made private.`
+      });
+    const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
     res.reaction = reaction;
     next();

@@ -93,6 +93,7 @@ describe("Auth Endpoints", function() {
     after("spacing", () => console.log("-------------------------------------\n"));
 
     it(`responds 200 and JWT auth token using secret`, () => {
+      this.retries(3);
       const testUser = testUsers[0];
       const expectedToken = jwt.sign({ user_id: testUser.id }, process.env.JWT_SECRET, {
         subject: testUser.email,
