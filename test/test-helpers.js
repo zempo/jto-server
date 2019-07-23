@@ -42,6 +42,16 @@ function makeUsersArray() {
       email: "test4@email.com",
       date_created: "2029-01-22T16:28:32.615Z",
       date_modified: null
+    },
+    {
+      id: 5,
+      admin: false,
+      user_name: "test-user-5",
+      full_name: "Test User Five",
+      password: "password",
+      email: "test5@email.com",
+      date_created: "2029-01-22T16:28:32.615Z",
+      date_modified: null
     }
   ];
 }

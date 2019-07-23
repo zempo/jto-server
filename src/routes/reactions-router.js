@@ -76,7 +76,7 @@ reactionsRouter
 reactionsRouter
   .route("/shares/:card_id")
   .all(requireAuth)
-  .get((req, res, next) => {
+  .get(matchedReactions, (req, res, next) => {
     res.send(res.reaction).end();
   })
   .patch(checkUserReacted, jsonBodyParser, (req, res, next) => {
@@ -113,7 +113,7 @@ async function checkUserReacted(req, res, next) {
     const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
     if (!card) {
       return res.status(404).json({
-        error: `This public card no longer exists. It might have been deleted or made private.`
+        error: `The reactions for this card are unavailable right now. They might have been made private or deleted.`
       });
     }
 
@@ -136,14 +136,14 @@ async function checkUserReactedOnce(req, res, next) {
     const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
     if (!card) {
       return res.status(404).json({
-        error: `This public card no longer exists. It might have been deleted or made private.`
+        error: `The reactions for this card are unavailable right now. They might have been made private or deleted.`
       });
     }
 
     const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
     if (reaction.length > 0)
-      return res.status(403).json({
+      return res.status(400).json({
         error: `Can't post reaction more than once.`
       });
 
@@ -157,10 +157,11 @@ async function checkUserReactedOnce(req, res, next) {
 async function matchedReactions(req, res, next) {
   try {
     const card = await ReactionsService.getCardReactions(req.app.get("db"), req.params.card_id);
-    if (!card)
+    if (!card) {
       return res.status(404).json({
-        error: `This public card no longer exists. It might have been deleted or made private.`
+        error: `The reactions for this card are unavailable right now. They might have been made private or deleted.`
       });
+    }
     const reaction = await ReactionsService.matchReaction(req.app.get("db"), req.params.card_id, req.user.id);
 
     res.reaction = reaction;

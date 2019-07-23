@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Protected endpoints", function() {
+describe("Protected endpoints", function () {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
@@ -87,10 +87,30 @@ describe("Protected endpoints", function() {
   describe(`GET /api/reactions/hearts/:card_id and /api/reactions/shares/:card_id by current user`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
-    context(`Given a user hasn't reacted to the card or card does not exist`, () => {
+
+    context(`Given card is not public`, () => {
+      after("spacing", () => console.log("\n"));
+      it("Returns 404 error", () => {
+        let card_id = 4;
+        return supertest(app)
+          .get(`/api/reactions/hearts/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+      });
+
+      it("Returns 404 error", () => {
+        let card_id = 4;
+        return supertest(app)
+          .get(`/api/reactions/hearts/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+      });
+    });
+
+    context(`Given a user hasn't reacted to the card`, () => {
       after("spacing", () => console.log("\n"));
       it("returns 200 and empty array for hearts", () => {
-        let card_id = 4;
+        let card_id = 5;
         return supertest(app)
           .get(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
@@ -98,7 +118,7 @@ describe("Protected endpoints", function() {
       });
 
       it("returns 200 and empty array for shares", () => {
-        let card_id = 4;
+        let card_id = 5;
         return supertest(app)
           .get(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
@@ -136,10 +156,58 @@ describe("Protected endpoints", function() {
     after("spacing", () => console.log("-------------------------------------\n"));
     beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
 
-    context(`Given user posts new reaction`, () => {
+    context(`Given user posts new reaction to a non-existant/private card`, () => {
       after("spacing", () => console.log("\n"));
-      it("returns 200 and expected heart", () => {
+      it("returns 404 error", () => {
         let card_id = 4;
+        let testUser = testUsers[1];
+        let expectedReaction = helpers.makeExpectedReactionsByUser(card_id, testUser.id, testReacts);
+
+        return supertest(app)
+          .post(`/api/reactions/hearts/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." })
+      });
+
+      it("returns 404 error", () => {
+        let card_id = 4;
+        let testUser = testUsers[1];
+        let expectedReaction = helpers.makeExpectedReactionsByUser(card_id, testUser.id, testReacts);
+
+        return supertest(app)
+          .post(`/api/reactions/shares/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." })
+      });
+    });
+
+    context(`Given accidentally posts reaction to card again`, () => {
+      after("spacing", () => console.log("\n"));
+      it("returns 400 error", () => {
+        let card_id = 2;
+        let testUser = testUsers[1];
+
+        return supertest(app)
+          .post(`/api/reactions/hearts/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(400, { error: "Can't post reaction more than once." })
+      });
+
+      it("returns 400 error", () => {
+        let card_id = 2;
+        let testUser = testUsers[1];
+
+        return supertest(app)
+          .post(`/api/reactions/shares/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(400, { error: "Can't post reaction more than once." })
+      });
+    });
+
+    context(`Given user posts new reaction to an existing public card`, () => {
+      after("spacing", () => console.log("\n"));
+      it("returns 201 and expected heart", () => {
+        let card_id = 1;
         let testUser = testUsers[1];
         let expectedReaction = helpers.makeExpectedReactionsByUser(card_id, testUser.id, testReacts);
 
@@ -157,8 +225,8 @@ describe("Protected endpoints", function() {
           });
       });
 
-      it("returns 200 and expected share", () => {
-        let card_id = 4;
+      it("returns 201 and expected share", () => {
+        let card_id = 1;
         let testUser = testUsers[1];
         let expectedReaction = helpers.makeExpectedReactionsByUser(card_id, testUser.id, testReacts);
 
@@ -178,11 +246,11 @@ describe("Protected endpoints", function() {
     });
   });
 
-  describe.only(`PATCH to toggle current reaction through /api/reactions/hearts/:card_id and /api/reactions/shares/:card_id by current user`, () => {
+  describe(`PATCH to toggle current reaction through /api/reactions/hearts/:card_id and /api/reactions/shares/:card_id by current user`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
 
-    context(`Given user has not posted reaction`, () => {
+    context(`Given the card does not exist`, () => {
       it("Toggles heart to opposite", () => {
         let card_id = 4;
         let testUser = testUsers[1];
@@ -190,7 +258,7 @@ describe("Protected endpoints", function() {
         return supertest(app)
           .patch(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(204);
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
       });
 
       it("Toggles share to true", () => {
@@ -200,7 +268,29 @@ describe("Protected endpoints", function() {
         return supertest(app)
           .patch(`/api/reactions/shares/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(204);
+          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+      });
+    });
+
+    context(`Given user hasn't posted reaction`, () => {
+      it("Returns error", () => {
+        let card_id = 5;
+        let testUser = testUsers[1];
+
+        return supertest(app)
+          .patch(`/api/reactions/hearts/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(403, { error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card." });
+      });
+
+      it("Returns error", () => {
+        let card_id = 5;
+        let testUser = testUsers[1];
+
+        return supertest(app)
+          .patch(`/api/reactions/shares/${card_id}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
+          .expect(403, { error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card." });
       });
     });
 

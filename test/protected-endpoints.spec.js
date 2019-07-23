@@ -114,6 +114,7 @@ describe("Protected endpoints reject unathorized users.", () => {
   protectedEndpoints.forEach((endpoint) => {
     describe(`${endpoint.name}`, () => {
       if (endpoint.path !== "/api/cards/make-public/:card_id") {
+
         it(`responds with 401: 'Missing Bearer Token', when no token`, () => {
           return endpoint.method(endpoint.path).expect(401, { error: "Missing Bearer Token" });
         });
@@ -134,6 +135,7 @@ describe("Protected endpoints reject unathorized users.", () => {
             .set("Authorization", helpers.makeAuthHeader(invalidUser))
             .expect(401, { error: `Unauthorized Request` });
         });
+
       }
     });
   });
