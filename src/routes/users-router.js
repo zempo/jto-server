@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const { requireAuth } = require("../middleware/jwt-auth");
 
 // setup
 const UsersService = require("../services/users-service");
@@ -8,10 +9,15 @@ const jsonBodyParser = express.json();
 
 usersRouter
   .route("/")
-  .get((req, res, next) => {
-    // for profile creation?
-    // get a particular user
-    // require authentication --> while logged-in, user will be displayed "logged in as John Doe" or "Welcome, John Doe"
+  .all(checkUsersExist)
+  .get(requireAuth, (req, res) => {
+    // for eventual admin/dev purposes
+    // maybe client-side administration?
+    if (req.user.admin) {
+      res.json(UsersService.serializeUsers(res.users));
+    } else {
+      res.status(403).end();
+    }
   })
   .post(jsonBodyParser, (req, res, next) => {
     const { password, user_name, full_name, email } = req.body;
@@ -61,5 +67,58 @@ usersRouter
     const result = validateUser(newUser, UsersService);
     result;
   });
+
+usersRouter
+  .route("/:user_id")
+  .all(requireAuth)
+  .all(checkUserExists)
+  .get((req, res) => {
+    if (req.user.id === res.user.id || req.user.admin) {
+      res.json(UsersService.serializeUser(res.user));
+    } else {
+      res.status(403).end();
+    }
+  })
+  .delete((req, res, next) => {
+    if (req.user.id === res.user.id || req.user.admin) {
+      UsersService.deleteUser(req.app.get("db"), res.user.id)
+        .then((rowsAffected) => {
+          res.status(204).end();
+        })
+        .catch(next);
+    } else {
+      res.status(403).end();
+    }
+  });
+
+async function checkUsersExist(req, res, next) {
+  try {
+    const users = await UsersService.getUsers(req.app.get("db"));
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.users = users;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function checkUserExists(req, res, next) {
+  try {
+    const user = await UsersService.getUserById(req.app.get("db"), req.params.user_id);
+
+    if (!user) {
+      return res.status(404).json({ message: "This user no longer exists" });
+    }
+
+    res.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
 
 module.exports = usersRouter;

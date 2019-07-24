@@ -1,4 +1,5 @@
 const xss = require("xss");
+const Treeize = require("treeize");
 const bcrypt = require("bcryptjs");
 const validator = require("email-validator");
 const swearjar = require("swearjar");
@@ -56,12 +57,27 @@ const optimizeSwearjar = (str) => {
 };
 
 const UsersService = {
+  getUsers(db) {
+    return db.select("*").from("jto_users");
+  },
+  getUserById(db, id) {
+    return db
+      .from("jto_users")
+      .select("*")
+      .where("id", id)
+      .first();
+  },
   insertUser(db, newUser) {
     return db
       .insert(newUser)
       .into("jto_users")
       .returning("*")
       .then(([user]) => user);
+  },
+  deleteUser(db, id) {
+    return db("jto_users")
+      .where({ id })
+      .delete();
   },
   uniqueUserName(db, user_name) {
     return db("jto_users")
@@ -136,14 +152,22 @@ const UsersService = {
   hashPassword(password) {
     return bcrypt.hash(password, 12);
   },
+  serializeUsers(users) {
+    return users.map(this.serializeUser);
+  },
   serializeUser(user) {
+    const userTree = new Treeize();
+
+    const userData = userTree.grow([user]).getData()[0];
+
     return {
-      id: user.id,
-      admin: user.admin,
-      user_name: xss(user.user_name),
-      full_name: xss(user.full_name),
-      email: xss(user.email),
-      date_created: new Date(user.date_created)
+      id: userData.id,
+      admin: userData.admin,
+      user_name: xss(userData.user_name),
+      full_name: xss(userData.full_name),
+      email: xss(userData.email),
+      date_created: new Date(userData.date_created),
+      date_modified: userData.date_modified || null
     };
   }
 };
