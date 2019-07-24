@@ -10,6 +10,7 @@ const REGEX_ALPHA_NUM_UNDERSCORE = /(^[A-Za-z0-9\-\_]+$)/;
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 const optimizeSwearjar = (str) => {
   let customList = process.env.SWEARS.split(" ");
+  let customList2 = process.env.SWEARS2.split(" ");
 
   // Process string
   let comparisonStr = str
@@ -41,14 +42,20 @@ const optimizeSwearjar = (str) => {
     .replace(/[8]/g, "b");
 
   let result = customList.filter((swear) => {
+    if (comparisonStr === swear || comparisonStr2 === swear) {
+      return true;
+    }
+  });
+  let result2 = customList2.filter((swear) => {
     if (comparisonStr.includes(swear) || comparisonStr2.includes(swear)) {
       return true;
     }
   });
   for (let key in swearjar._badWords) {
     if (
-      (swearjar._badWords.hasOwnProperty(key) && (comparisonStr.includes(key) || comparisonStr2.includes(key))) ||
-      result.length > 0
+      (swearjar._badWords.hasOwnProperty(key) && (comparisonStr === key || comparisonStr2 === key)) ||
+      result.length > 0 ||
+      result2.length > 0
     ) {
       return true;
     }
