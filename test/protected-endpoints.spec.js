@@ -108,13 +108,27 @@ describe("Protected endpoints reject unathorized users.", () => {
       name: "PATCH /api/reactions/shares/:card_id",
       path: "/api/reactions/shares/:card_id",
       method: supertest(app).patch
+    },
+    {
+      name: "GET /api/users/",
+      path: "/api/users",
+      method: supertest(app).get
+    },
+    {
+      name: "GET /api/users/:user_id",
+      path: "/api/users/:user_id",
+      method: supertest(app).get
+    },
+    {
+      name: "DELETE /api/users/:user_id",
+      path: "/api/users/:user_id",
+      method: supertest(app).delete
     }
   ];
 
   protectedEndpoints.forEach((endpoint) => {
     describe(`${endpoint.name}`, () => {
       if (endpoint.path !== "/api/cards/make-public/:card_id") {
-
         it(`responds with 401: 'Missing Bearer Token', when no token`, () => {
           return endpoint.method(endpoint.path).expect(401, { error: "Missing Bearer Token" });
         });
@@ -135,7 +149,6 @@ describe("Protected endpoints reject unathorized users.", () => {
             .set("Authorization", helpers.makeAuthHeader(invalidUser))
             .expect(401, { error: `Unauthorized Request` });
         });
-
       }
     });
   });

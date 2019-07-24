@@ -168,8 +168,6 @@ const UsersService = {
     const userData = userTree.grow([user]).getData()[0];
 
     return {
-      id: userData.id,
-      admin: userData.admin,
       user_name: xss(userData.user_name),
       full_name: xss(userData.full_name),
       email: xss(userData.email),
