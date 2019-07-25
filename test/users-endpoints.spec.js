@@ -75,7 +75,7 @@ describe("User endpoints", () => {
     });
   });
 
-  describe.only(`POST /api/users/`, () => {
+  describe(`POST /api/users/`, () => {
     context("Incomplete user registration", () => {
       after("spacing", () => console.log("-------------------------------------\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
@@ -85,10 +85,15 @@ describe("User endpoints", () => {
           email: "mickey@gmail.com"
         },
         {
+          password: "passwordF3@"
+        },
+        {
           user_name: "mike",
           password: "passwordF3@"
         },
         {
+          user_name: "mike",
+          full_name: "mike wazowski",
           password: "passwordF3@"
         }
       ];
@@ -112,30 +117,112 @@ describe("User endpoints", () => {
 
       const invalidFields = [
         {
-          user_name: "a$$",
+          user_name: "test-user-1",
           full_name: "Invalory Profane",
           email: "validemail@gmail.com",
           password: "Validpwd45!"
         },
         {
-          user_name: "a$$",
+          user_name: "valid-test-user",
+          full_name: "Invalory Profane",
+          email: "test1@email.com",
+          password: "Validpwd45!"
+        },
+        {
+          user_name: "ass",
           full_name: "Invalory Profane",
           email: "validemail@gmail.com",
           password: "Validpwd45!"
         },
         {
-          user_name: "a$$",
+          user_name: "@#$%#-the-first",
+          full_name: "Invalory Profane",
+          email: "validemail@gmail.com",
+          password: "Validpwd45!"
+        },
+        {
+          user_name: "q",
+          full_name: "Invalory Profane",
+          email: "validemail@gmail.com",
+          password: "invalidpassword"
+        },
+        {
+          user_name: "invalidinvalidinvalidinvalidinvalidinvalidinvalidkjsddpoijkopjpokpokpokopkpokopkpokpokpok",
+          full_name: "Invalory Profane",
+          email: "validemail@gmail.com",
+          password: "invalidpassword"
+        },
+        {
+          user_name: "valid",
+          full_name: "Invalory Profane",
+          email: "validemail@gmail.com",
+          password: "Pwd45!"
+        },
+        {
+          user_name: "valid",
+          full_name: "Invalory Profane",
+          email: "validemail@gmail.com",
+          password:
+            "invalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpasswordinvalidpassword"
+        },
+        {
+          user_name: "valid-user",
+          full_name: "Invalory Profane",
+          email: "not@mailletmeloginalready@",
+          password: "Validpwd45!"
+        }
+      ];
+
+      invalidFields.forEach((request) => {
+        it("Throws error when invalid req", () => {
+          return supertest(app)
+            .post(`/api/users`)
+            .send(request)
+            .expect(400)
+            .expect((res) => {
+              console.log(res.body);
+              expect(res.body).to.have.property("error");
+            });
+        });
+      });
+    });
+
+    context("Valid and complete user registration", () => {
+      after("spacing", () => console.log("-------------------------------------\n"));
+      beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
+
+      const validFields = [
+        {
+          user_name: "valid-user",
           full_name: "Invalory Profane",
           email: "validemail@gmail.com",
           password: "Validpwd45!"
         }
       ];
-    });
 
-    // context("Valid and complete user registration", () => {
-    //   after("spacing", () => console.log("-------------------------------------\n"));
-    //   beforeEach("insert cards", () => helpers.seedCardsTables2(db, testUsers, testCards, testComments, testReacts));
-    // });
+      validFields.forEach((request) => {
+        it("creates new user", () => {
+          return supertest(app)
+            .post(`/api/users`)
+            .send(request)
+            .expect(201)
+            .expect((res) => {
+              console.log(res.body);
+              //   expect(res.body).to.have.property("error");
+              expect(res.body).to.be.an("object");
+              expect(res.body).to.not.have.property("id");
+              expect(res.body).to.not.have.property("admin");
+              expect(res.body).to.have.property("user_name");
+              expect(res.body).to.have.property("full_name");
+              expect(res.body).to.have.property("email");
+              expect(res.body).to.have.property("date_created");
+              expect(res.body.user_name).to.eql(request.user_name);
+              expect(res.body.full_name).to.eql(request.full_name);
+              expect(res.body.email).to.eql(request.email);
+            });
+        });
+      });
+    });
   });
 
   describe(`DELETE /api/users/:user_id`, () => {
