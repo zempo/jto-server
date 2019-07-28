@@ -79,7 +79,9 @@ const UsersService = {
       .insert(newUser)
       .into("jto_users")
       .returning("*")
-      .then(([user]) => user);
+      .then(([user]) => {
+        return user
+      });
   },
   deleteUser(db, id) {
     return db("jto_users")

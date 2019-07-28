@@ -9,8 +9,7 @@ const jsonBodyParser = express.json();
 
 usersRouter
   .route("/")
-  .all(checkUsersExist)
-  .get(requireAuth, (req, res) => {
+  .get(requireAuth, checkUsersExist, (req, res) => {
     // for eventual admin/dev purposes
     // maybe client-side administration?
     if (req.user.admin) {
@@ -50,7 +49,6 @@ usersRouter
         // then we hash password
         let hashpwd = await service.hashPassword(user.password);
         user.password = hashpwd;
-
         // then we insert the new user
         let insertedUser = await service.insertUser(req.app.get("db"), user);
         if (!insertedUser) return res.status(500).json({ error: "Sorry, our servers appear to be down :/" });
