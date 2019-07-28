@@ -129,6 +129,12 @@ describe("User endpoints", () => {
           password: "Validpwd45!"
         },
         {
+          user_name: "  spacey-test-user",
+          full_name: "Invalory Profane",
+          email: "test1@email.com",
+          password: "Validpwd45!"
+        },
+        {
           user_name: "ass",
           full_name: "Invalory Profane",
           email: "validemail@gmail.com",
