@@ -22,7 +22,9 @@ INSERT INTO jto_cards
     ('roboto', 'Celebrate Good Times, Come on!', 'https://loremflickr.com/g/320/240/happy', 'Celebrate good times! buddy, come on! Dadadada, da da da da da-da!', '', 3, TRUE),
     ('cursive-plus', 'You Are Cordially Invited to the Wedding of Mike and Ike', 'https://loremflickr.com/g/500/400/wedding', 'It will be at Hampden South and Oak lane. If you reach the magestic waterfall, you''ve gone too far. Food will be provided! For the Grooms, that is!', 'https://loremflickr.com/g/320/240/ring', 2, default),
     ('kiddo', 'I don''t abhor arbor day! And neither should you!', 'https://loremflickr.com/g/500/400/trees', 'Tree-t others the way you want to be treated!', 'https://loremflickr.com/g/320/240/tree', 1, default),
-    ('kiddo', 'Jessica, I love the way you smile', 'https://loremflickr.com/g/500/400/trees', 'But you should wear some deoderant', 'https://loremflickr.com/g/320/240/tree', 1, default);
+    ('kiddo', 'Jessica, I love the way you smile', 'https://loremflickr.com/g/500/400/trees', 'But you should wear some deoderant', 'https://loremflickr.com/g/320/240/tree', 1, default),
+    ('pen', 'Don''t tread on me', 'https://loremflickr.com/g/400/500/spring', 'Stay off my property', 'https://loremflickr.com/g/320/240/cake', 1, default),
+    ('pen', 'Love the way you smile on this fine day', 'https://loremflickr.com/g/400/500/spring', 'Hey, friend', 'https://loremflickr.com/g/320/240/cake', 1, default);
 
 INSERT INTO jto_comments
     (body, card_id, user_id)
