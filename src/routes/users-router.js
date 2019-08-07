@@ -67,6 +67,13 @@ usersRouter
   });
 
 usersRouter
+  .route("/public/:user_id")
+  .all(checkUserExists)
+  .get((req, res) => {
+    res.json(UsersService.serializeUsername(res.user));
+  });
+
+usersRouter
   .route("/:user_id")
   .all(requireAuth)
   .all(checkUserExists)

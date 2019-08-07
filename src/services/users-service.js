@@ -177,6 +177,16 @@ const UsersService = {
       date_created: new Date(userData.date_created),
       date_modified: userData.date_modified || null
     };
+  },
+  serializeUsername(user) {
+    const userTree = new Treeize();
+
+    const userData = userTree.grow([user]).getData()[0];
+
+    return {
+      admin: userData.admin,
+      user_name: xss(userData.user_name)
+    };
   }
 };
 
