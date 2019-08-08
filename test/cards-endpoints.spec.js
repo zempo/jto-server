@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Cards endpoints", function () {
+describe("Cards endpoints", function() {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
@@ -24,7 +24,7 @@ describe("Cards endpoints", function () {
   describe(`GET public cards at /api/cards`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     context(`Given no public cards`, () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       it(`Responds with 200 and an empty list`, () => {
         return supertest(app)
           .get("/api/cards")
@@ -33,7 +33,7 @@ describe("Cards endpoints", function () {
     });
 
     context(`Given existing public cards`, () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 200 and all public cards`, () => {
@@ -62,7 +62,7 @@ describe("Cards endpoints", function () {
     });
 
     context("Given an XSS attack card", () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       const testUser = helpers.makeUsersArray()[0];
       const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
 
@@ -85,7 +85,7 @@ describe("Cards endpoints", function () {
   describe(`GET a public card at api/card/:card_id`, () => {
     after("spacing", () => console.log("-------------------------------------\n"));
     context(`Given a public card doesn't exist or isn't public`, () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 404 because it doesn't exist`, () => {
@@ -104,7 +104,7 @@ describe("Cards endpoints", function () {
     });
 
     context(`Given a public card that exists`, () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 200 and card`, () => {
@@ -117,7 +117,7 @@ describe("Cards endpoints", function () {
     });
 
     context("Given an XSS attack card", () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       const testUser = helpers.makeUsersArray()[0];
       const { maliciousCard, expectedCard } = helpers.makeMaliciousCard(testUser);
 
@@ -139,7 +139,7 @@ describe("Cards endpoints", function () {
 
   describe("GET comments of a card at /api/cards/comments/:card_id", () => {
     context("The card exists, but there are no comments", () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it("Responds with 200 and empty array", () => {
@@ -152,11 +152,11 @@ describe("Cards endpoints", function () {
     });
 
     context("The card exists and has comments", () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
       it("Responds with 200 and the corresponding comments", () => {
         let card_id = 6;
-        const expectedCardComments = helpers.makeExpectedCardComments(card_id, testComments);
+        const expectedCardComments = helpers.makeExpectedCardComments(card_id, testComments, testUsers);
 
         return supertest(app)
           .get(`/api/cards/comments/${card_id}`)
@@ -167,7 +167,7 @@ describe("Cards endpoints", function () {
 
   describe("PATCH the privacy of a card at /api/cards/make-private/:card_id", () => {
     context("The card has already been made private", () => {
-      after("spacer", () => console.log('\n'))
+      after("spacer", () => console.log("\n"));
       beforeEach("insert cards", () => helpers.seedCardsTables(db, testUsers, testCards, testComments, testReacts));
 
       it(`Responds with 404 because the resource has been moved or deleted`, () => {

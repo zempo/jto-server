@@ -47,7 +47,7 @@ cardRouter
   .get((req, res, next) => {
     CardsService.getCommentsByCard(req.app.get("db"), res.card["id"])
       .then((comments) => {
-        res.json(comments);
+        res.json(CardsService.serializeCardComments(comments));
       })
       .catch(next);
   });

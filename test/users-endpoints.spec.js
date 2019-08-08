@@ -37,7 +37,7 @@ describe("User endpoints", () => {
           .expect((res) => {
             expect(res.body).to.be.an("array");
             expect(res.body[0]).to.not.have.property("id");
-            expect(res.body[0]).to.not.have.property("admin");
+            expect(res.body[0]).to.have.property("admin");
             expect(res.body[0]).to.have.property("user_name");
             expect(res.body[0]).to.have.property("full_name");
             expect(res.body[0]).to.have.property("email");
@@ -61,7 +61,7 @@ describe("User endpoints", () => {
           .expect((res) => {
             expect(res.body).to.be.an("object");
             expect(res.body).to.not.have.property("id");
-            expect(res.body).to.not.have.property("admin");
+            expect(res.body).to.have.property("admin");
             expect(res.body).to.have.property("user_name");
             expect(res.body).to.have.property("full_name");
             expect(res.body).to.have.property("email");
@@ -217,7 +217,7 @@ describe("User endpoints", () => {
               //   expect(res.body).to.have.property("error");
               expect(res.body).to.be.an("object");
               expect(res.body).to.not.have.property("id");
-              expect(res.body).to.not.have.property("admin");
+              expect(res.body).to.have.property("admin");
               expect(res.body).to.have.property("user_name");
               expect(res.body).to.have.property("full_name");
               expect(res.body).to.have.property("email");

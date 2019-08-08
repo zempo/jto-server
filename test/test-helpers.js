@@ -372,17 +372,23 @@ function makeExpectedComments(users, comment_id, comments) {
   });
 }
 
-function makeExpectedCardComments(card_id, comments) {
+function makeExpectedCardComments(card_id, comments, users) {
   const expectedComments = comments.filter((comment) => comment.card_id === card_id);
 
   return expectedComments.map((comment) => {
+    let commentUser = users.filter((usr) => usr.id === comment.user_id)[0];
     return {
       id: comment.id,
       body: comment.body,
       date_created: comment.date_created,
       date_modified: comment.date_modified,
       card_id: comment.card_id,
-      user_id: comment.user_id
+      user: {
+        id: commentUser.id,
+        admin: commentUser.admin,
+        user_name: commentUser.user_name,
+        date_created: commentUser.date_created
+      }
     };
   });
 }

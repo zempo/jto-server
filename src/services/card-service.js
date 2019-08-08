@@ -25,9 +25,17 @@ const CardsService = {
   },
   getCommentsByCard(db, id) {
     return db
-      .from("jto_comments")
-      .select("*")
-      .where("jto_comments.card_id", id);
+      .from("jto_comments AS comments")
+      .select(
+        "comments.id",
+        "comments.body",
+        "comments.date_created",
+        "comments.date_modified",
+        "comments.card_id",
+        ...userFields
+      )
+      .leftJoin("jto_users AS usr", "comments.user_id", "usr.id")
+      .where("comments.card_id", id);
   },
   getPublicById(db, id) {
     return CardsService.getPublicCards(db)
@@ -55,6 +63,23 @@ const CardsService = {
       user: cardData.user || {},
       number_of_comments: Number(cardData.number_of_comments) || 0
     };
+  },
+  serializeCardComments(comments) {
+    return comments.map(this.serializeCardComment);
+  },
+  serializeCardComment(comment) {
+    const commentTree = new Treeize();
+
+    const commentData = commentTree.grow([comment]).getData()[0];
+
+    return {
+      id: commentData.id,
+      body: xss(commentData.body),
+      date_created: commentData.date_created,
+      date_modified: commentData.date_modified || null,
+      card_id: commentData.card_id,
+      user: commentData.user || {}
+    };
   }
 };
 
@@ -64,12 +89,6 @@ const userFields = [
   "usr.user_name AS user:user_name",
   "usr.date_created AS user:date_created",
   "usr.date_modified AS user:date_modified"
-];
-
-const commentFields = [
-  "comments.id AS comment:id",
-  "comments.body AS comment:body",
-  "comments.date_created AS comment:date_created"
 ];
 
 module.exports = CardsService;
