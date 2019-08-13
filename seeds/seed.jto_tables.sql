@@ -17,7 +17,7 @@ INSERT INTO jto_cards
     (theme, front_message, front_image, inside_message, inside_image, user_id, public)
     VALUES 
     (default, 'Happy Mothers Day!', 'https://loremflickr.com/g/500/400/flowers', 'To the best Mom ever!', 'https://loremflickr.com/g/320/240/mom', 1, TRUE),
-    ('indie', 'Happy Fathers Day!', '', 'To an amazing dad!', 'https://loremflickr.com/g/320/240/dad', 2, TRUE),
+    ('cursive-plus', 'Happy Fathers Day!', '', 'To an amazing dad!', 'https://loremflickr.com/g/320/240/dad', 2, TRUE),
     ('pen', 'Maybe it''s May...', 'https://loremflickr.com/g/400/500/spring', 'I wouldn''t know, though. Here''s to hoping that I guess your birthday correctly!', 'https://loremflickr.com/g/320/240/cake', 1, TRUE),
     ('roboto', 'Celebrate Good Times, Come on!', 'https://loremflickr.com/g/320/240/happy', 'Celebrate good times! buddy, come on! Dadadada, da da da da da-da!', '', 3, TRUE),
     (default, 'Great Greetings to You', 'https://loremflickr.com/g/500/400/flowers', 'You make someone smile, I bet!', 'https://loremflickr.com/g/320/240/mom', 1, TRUE),
