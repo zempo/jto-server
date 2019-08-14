@@ -74,7 +74,10 @@ INSERT INTO jto_reacts
     (3, 2, default, TRUE),
     (3, 3, TRUE, TRUE),
     (4, 1, default, default),
-    (4, 2, default, TRUE);
+    (4, 2, default, TRUE),
+    (20, 1, TRUE, TRUE),
+    (20, 2, TRUE, TRUE),
+    (20, 3, TRUE, TRUE);
 
 
 COMMIT; 
