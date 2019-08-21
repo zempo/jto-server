@@ -39,6 +39,46 @@ cardRouter
     } else {
       res.status(403).end();
     }
+  })
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { theme, front_message, front_image, inside_message, inside_image } = req.body;
+
+    const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
+    const numberOfValues = Object.values(cardToUpdate).filter(Boolean).length;
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: "Request body must include either theme, front_message, front_image, inside_message, or inside_image"
+      });
+    }
+    cardToUpdate.date_modified = new Date().toLocaleString();
+
+    async function correctPatch(card, service) {
+      try {
+        const error = await service.patchValidator(card);
+        if (error) return res.status(400).json(error);
+
+        if (card.front_message != null) {
+          const sanitizeFront = await service.sanitizeCard(card.front_message);
+          card.front_message = sanitizeFront;
+        }
+        if (card.inside_message != null) {
+          const sanitizeInside = await service.sanitizeCard(card.inside_message);
+          card.inside_message = sanitizeInside;
+        }
+
+        const updatedCard = await service.updateCard(req.app.get("db"), req.params.card_id, card);
+        if (!updatedCard) {
+          return res.status(409).json({ error: "request timeout" });
+        }
+
+        return res.status(204).end();
+      } catch (error) {
+        next(error);
+      }
+    }
+
+    const result = correctPatch(cardToUpdate, PrivateService);
+    result;
   });
 
 cardRouter
