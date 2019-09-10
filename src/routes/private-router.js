@@ -50,8 +50,7 @@ privateRouter.route("/images").post(requireAuth, (req, res, next) => {
 privateRouter
   .route("/cards/:user_id")
   .all(requireAuth)
-  .all(checkForPrivateCards)
-  .get((req, res) => {
+  .get(checkForPrivateCards, (req, res) => {
     if (req.user.id === res.cards[0]["user:id"]) {
       res.json(PrivateService.serializeCards(res.cards));
     } else {
@@ -127,11 +126,9 @@ privateRouter
     const cardToUpdate = { theme, front_message, front_image, inside_message, inside_image };
     const numberOfValues = Object.values(cardToUpdate).filter(Boolean).length;
     if (numberOfValues === 0) {
-      return res
-        .status(400)
-        .json({
-          error: "Request body must include either theme, front_message, front_image, inside_message, or inside_image"
-        });
+      return res.status(400).json({
+        error: "Request body must include either theme, front_message, front_image, inside_message, or inside_image"
+      });
     }
     cardToUpdate.date_modified = new Date().toLocaleString();
 
