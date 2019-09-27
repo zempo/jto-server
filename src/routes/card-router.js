@@ -21,6 +21,12 @@ cardRouter.route("/").get((req, res, next) => {
 // get cards --> delete card --> get cards
 // get cards --> click card edit --> get card --> populate form values --> patch card --> get cards
 // get cards --> click make private --> recieve notificaton --> patch card public to false --> get cards, card should be missing
+cardRouter
+  .route("/any/:card_id")
+  .all(checkAnyCardExists)
+  .get((req, res) => {
+    res.json(CardsService.serializeCard(res.any_card));
+  });
 
 cardRouter
   .route("/:card_id")
@@ -116,12 +122,30 @@ async function checkCardExists(req, res, next) {
   try {
     const card = await CardsService.getPublicById(req.app.get("db"), req.params.card_id);
 
-    if (!card)
+    if (!card) {
       return res.status(404).json({
         error: `This public card no longer exists. It might have been deleted or made private.`
       });
+    }
 
     res.card = card;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function checkAnyCardExists(req, res, next) {
+  try {
+    const anyCard = await CardsService.getAnyById(req.app.get("db"), req.params.card_id);
+
+    if (!anyCard) {
+      return res.status(404).json({
+        error: `This card no longer exists. It has been deleted.`
+      });
+    }
+
+    res.any_card = anyCard;
     next();
   } catch (error) {
     next(error);

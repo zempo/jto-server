@@ -2,6 +2,26 @@ const xss = require("xss");
 const Treeize = require("treeize");
 
 const CardsService = {
+  getAllCards(db) {
+    return db
+      .from("jto_cards AS card")
+      .select(
+        "card.id",
+        "card.theme",
+        "card.front_message",
+        "card.front_image",
+        "card.inside_message",
+        "card.inside_image",
+        "card.date_created",
+        "card.date_modified",
+        "card.public",
+        ...userFields,
+        db.raw(`count(DISTINCT comments) AS number_of_comments`)
+      )
+      .leftJoin("jto_comments AS comments", "comments.card_id", "card.id")
+      .leftJoin("jto_users AS usr", "card.user_id", "usr.id")
+      .groupBy("card.id", "usr.id");
+  },
   getPublicCards(db) {
     return db
       .from("jto_cards AS card")
@@ -36,6 +56,11 @@ const CardsService = {
       )
       .leftJoin("jto_users AS usr", "comments.user_id", "usr.id")
       .where("comments.card_id", id);
+  },
+  getAnyById(db, id) {
+    return CardsService.getAllCards(db)
+      .where("card.id", id)
+      .first();
   },
   getPublicById(db, id) {
     return CardsService.getPublicCards(db)
