@@ -2,7 +2,7 @@ const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
-describe("Protected endpoints", function () {
+describe("Protected endpoints", function() {
   let db;
 
   const { testUsers, testCards, testComments, testReacts } = helpers.makeJtoFixtures();
@@ -10,7 +10,7 @@ describe("Protected endpoints", function () {
   before("Instantiate knex", () => {
     db = knex({
       client: "pg",
-      connection: process.env.DB_TESTING_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set("db", db);
   });
@@ -95,7 +95,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .get(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
 
       it("Returns 404 error", () => {
@@ -103,7 +106,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .get(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
     });
 
@@ -166,7 +172,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .post(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." })
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
 
       it("returns 404 error", () => {
@@ -177,7 +186,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .post(`/api/reactions/shares/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." })
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
     });
 
@@ -190,7 +202,7 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .post(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(400, { error: "Can't post reaction more than once." })
+          .expect(400, { error: "Can't post reaction more than once." });
       });
 
       it("returns 400 error", () => {
@@ -200,7 +212,7 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .post(`/api/reactions/shares/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(400, { error: "Can't post reaction more than once." })
+          .expect(400, { error: "Can't post reaction more than once." });
       });
     });
 
@@ -258,7 +270,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .patch(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
 
       it("Toggles share to true", () => {
@@ -268,7 +283,10 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .patch(`/api/reactions/shares/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(404, { error: "The reactions for this card are unavailable right now. They might have been made private or deleted." });
+          .expect(404, {
+            error:
+              "The reactions for this card are unavailable right now. They might have been made private or deleted."
+          });
       });
     });
 
@@ -280,7 +298,9 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .patch(`/api/reactions/hearts/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(403, { error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card." });
+          .expect(403, {
+            error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card."
+          });
       });
 
       it("Returns error", () => {
@@ -290,7 +310,9 @@ describe("Protected endpoints", function () {
         return supertest(app)
           .patch(`/api/reactions/shares/${card_id}`)
           .set("Authorization", helpers.makeAuthHeader(testUsers[1]))
-          .expect(403, { error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card." });
+          .expect(403, {
+            error: "Can't patch reaction unless it is posted and references BOTH logged-in user AND card."
+          });
       });
     });
 

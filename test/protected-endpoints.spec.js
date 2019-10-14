@@ -10,7 +10,7 @@ describe("Protected endpoints reject unathorized users.", () => {
   before("Instantiate knex", () => {
     db = knex({
       client: "pg",
-      connection: process.env.DB_TESTING_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set("db", db);
   });

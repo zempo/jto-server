@@ -10,7 +10,7 @@ describe("Endpoints for a user's private cards", function() {
   before("Instantiate knex", () => {
     db = knex({
       client: "pg",
-      connection: process.env.DB_TESTING_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set("db", db);
   });
