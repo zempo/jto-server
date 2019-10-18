@@ -14,7 +14,7 @@ _The Greeting Card Platfrom_
 
 ## Goals
 
-![Screenshot of the landing page](https://imgur.com/JGtL5Ag)
+![Screenshot of the landing page](https://imgur.com/JGtL5Ag.jpg)
 
 ## Guide
 
