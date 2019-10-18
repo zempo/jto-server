@@ -41,10 +41,6 @@ commentsRouter.route("/").post(requireAuth, jsonBodyParser, (req, res, next) => 
   result;
 });
 
-// post new comment --> get comments
-// get comments --> delete comment --> get comments
-// get comments --> click comment edit --> get comment --> populate form values --> patch comment --> get comments
-
 // add a user to comment verification middleware
 commentsRouter
   .route("/:comment_id")

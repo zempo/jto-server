@@ -20,13 +20,8 @@ const reactionsRouter = require("./routes/reactions-router");
 
 const app = express();
 // MIDDLEWARE
-// make sure cors() is at the top
 app.use(cors());
 
-// just in case you want to post nested content for download
-// https://stackoverflow.com/questions/29960764/what-does-extended-mean-in-express-4-0
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 const morganOption = NODE_ENV === "production" ? "tiny" : "dev";
 if (NODE_ENV !== "production") {
   logger.add(

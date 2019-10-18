@@ -17,10 +17,6 @@ cardRouter.route("/").get((req, res, next) => {
 });
 
 // Auth required
-// post new card --> get cards
-// get cards --> delete card --> get cards
-// get cards --> click card edit --> get card --> populate form values --> patch card --> get cards
-// get cards --> click make private --> recieve notificaton --> patch card public to false --> get cards, card should be missing
 cardRouter
   .route("/any/:card_id")
   .all(checkAnyCardExists)

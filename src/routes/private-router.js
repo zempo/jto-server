@@ -93,10 +93,6 @@ privateRouter
   });
 
 // Auth required
-// post new private card --> get private cards
-// get private cards --> delete private card --> get private cards
-// get private cards --> click private card edit --> get private card --> populate form values --> patch private card --> get private cards
-// get private cards --> click make private --> recieve notificaton --> patch private card public to false --> get private cards, private card should be missing
 
 privateRouter
   .route("/cards/:user_id/:card_id")

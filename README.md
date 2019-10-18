@@ -1,44 +1,21 @@
-# Express Boilerplate!
+# Just The Occasion
 
-This is a boilerplate project used for starting new projects!
+_The Greeting Card Platfrom_
 
-## Set up
+## Links
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+- Live App
 
-1. Clone this repository to your local machine `git clone https://github.com/zempo/node_boilerplate.git NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+[Here](https://just-the-occasion.netlify.com/)
 
-## Database (Sql)
+- Front End
 
-1. Run `npm i knex` and then `npm i pg` (for postgres, in this case).
-2. Reference the [Knex Documentation](https://knexjs.org/) for more.
-3. A sample db url has been added to the example env
-4. Getting started
+[Here](https://github.com/zempo/jto-client)
 
-```
-const knex = require("knex");
+## Goals
 
-const knexInstance = knex({
-  client: "pg",
-  connection: process.env.DB_URL
-});
+## Guide
 
-console.log("connection successful");
-```
+## Screenshots
 
-## Scripts
-
-Start the application `npm start`
-
-Start nodemon for the application `npm run dev`
-
-Run the tests `npm test`
-
-## Deploying
-
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+## Tech Used
