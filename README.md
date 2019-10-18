@@ -18,16 +18,20 @@ _The Greeting Card Platfrom_
 
 ## Screenshots
 
-_Landing Page_
-![Screenshot of the landing page](https://imgur.com/JGtL5Ag.jpg)
+### Landing Page
 
-_Create_
+![Screenshot of the landing page](https://imgur.com/em2AP1z.jpg)
+
+### Create &#10231; Edit &#10231; Delete
 
 ![Gif of Creating an Occasion](https://imgur.com/CiQOguJ.gif)
 
-_Download_
-![Gif of the Download Occasion Editor](https://imgur.com/9iSEW7r.gif)
+### Download
 
-_Browse_
+![Gif of the Download Editor](https://imgur.com/9iSEW7r.gif)
+
+### Browse
+
+![Screenshot of the Browse page](https://imgur.com/em2AP1z.jpg)
 
 ## Tech Used
