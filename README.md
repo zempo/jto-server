@@ -32,6 +32,11 @@ _The Greeting Card Platfrom_
 
 ### Browse
 
-![Screenshot of the Browse page](https://imgur.com/em2AP1z.jpg)
+![Screenshot of the Browse page](https://imgur.com/yFK3SUT.jpg)
+![Second Screenshot of the Browse page](https://imgur.com/IavzIBb.jpg)
+
+### Socialize
+
+![Screenshot of public card](https://imgur.com/OU96jhI.jpg)
 
 ## Tech Used
