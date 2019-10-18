@@ -14,10 +14,20 @@ _The Greeting Card Platfrom_
 
 ## Goals
 
-![Screenshot of the landing page](https://imgur.com/JGtL5Ag.jpg)
-
 ## Guide
 
 ## Screenshots
+
+_Landing Page_
+![Screenshot of the landing page](https://imgur.com/JGtL5Ag.jpg)
+
+_Create_
+
+![Gif of Creating an Occasion](https://imgur.com/CiQOguJ.gif)
+
+_Download_
+![Gif of the Download Occasion Editor](https://imgur.com/9iSEW7r.gif)
+
+_Browse_
 
 ## Tech Used
