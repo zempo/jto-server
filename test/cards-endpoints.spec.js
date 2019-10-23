@@ -39,12 +39,6 @@ describe("Cards endpoints", function() {
       it(`Responds with 200 and all public cards`, () => {
         const expectedCards = testCards
           .filter((card, i, cards) => {
-            // console.log(card["public"]);
-            // first filter to simulate a query
-            // then map through
-            // otherwise you'll return
-            // undefined at the array indexes that don't
-            // meet the query criteria.
             if (card["public"] == true) {
               return true;
             } else {
