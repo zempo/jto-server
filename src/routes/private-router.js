@@ -22,7 +22,6 @@ cloudinary.config({
 // to-do: require auth
 privateRouter.route("/images").post(requireAuth, (req, res, next) => {
   // upload the files, first
-  console.log(req.files);
   async function processImages(files, service) {
     try {
       const sizeError = await service.validateSize(files);
