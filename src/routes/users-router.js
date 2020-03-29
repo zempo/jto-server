@@ -20,7 +20,7 @@ usersRouter
   })
   .post(jsonBodyParser, (req, res, next) => {
     const { password, user_name, full_name, email } = req.body;
-    const newUser = { password, user_name, full_name, email };
+    const newUser = { password, user_name, admin: false, full_name, email };
 
     async function validateUser(user, service) {
       try {
@@ -38,20 +38,36 @@ usersRouter
         if (invalidEmail) return res.status(400).json({ error: invalidEmail });
 
         let invalidPassword = await service.validatePassword(user.password);
-        if (invalidPassword) return res.status(400).json({ error: invalidPassword });
+        if (invalidPassword)
+          return res.status(400).json({ error: invalidPassword });
 
-        let userNameExists = await service.uniqueUserName(req.app.get("db"), user.user_name);
-        if (userNameExists) return res.status(400).json({ error: "Username already taken." });
+        let userNameExists = await service.uniqueUserName(
+          req.app.get("db"),
+          user.user_name
+        );
+        if (userNameExists)
+          return res.status(400).json({ error: "Username already taken." });
 
-        let emailExists = await service.uniqueEmail(req.app.get("db"), user.email);
-        if (emailExists) return res.status(400).json({ error: "An account with this email has already been created." });
+        let emailExists = await service.uniqueEmail(
+          req.app.get("db"),
+          user.email
+        );
+        if (emailExists)
+          return res
+            .status(400)
+            .json({
+              error: "An account with this email has already been created."
+            });
 
         // then we hash password
         let hashpwd = await service.hashPassword(user.password);
         user.password = hashpwd;
         // then we insert the new user
         let insertedUser = await service.insertUser(req.app.get("db"), user);
-        if (!insertedUser) return res.status(500).json({ error: "Sorry, our servers appear to be down :/" });
+        if (!insertedUser)
+          return res
+            .status(500)
+            .json({ error: "Sorry, our servers appear to be down :/" });
 
         return res
           .status(201)
@@ -87,7 +103,7 @@ usersRouter
   .delete((req, res, next) => {
     if (req.user.id === res.user.id || req.user.admin) {
       UsersService.deleteUser(req.app.get("db"), res.user.id)
-        .then((rowsAffected) => {
+        .then(rowsAffected => {
           res.status(204).end();
         })
         .catch(next);
@@ -113,7 +129,10 @@ async function checkUsersExist(req, res, next) {
 
 async function checkUserExists(req, res, next) {
   try {
-    const user = await UsersService.getUserById(req.app.get("db"), req.params.user_id);
+    const user = await UsersService.getUserById(
+      req.app.get("db"),
+      req.params.user_id
+    );
 
     if (!user) {
       return res.status(404).json({ message: "This user no longer exists" });
